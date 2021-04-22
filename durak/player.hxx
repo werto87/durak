@@ -5,6 +5,9 @@
 #include <cstddef>
 #include <sys/types.h>
 #include <vector>
+
+namespace durak
+{
 struct Player
 {
 public:
@@ -23,5 +26,5 @@ public:
 private:
   std::vector<Card> cards{};
 };
-
+}
 #endif /* A85D1720_A39F_43B7_B56C_7843E3A02A0D */

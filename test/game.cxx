@@ -15,7 +15,8 @@
 #include <tuple>
 #include <utility>
 #include <vector>
-namespace test
+
+namespace durak::test
 {
 
 TEST_CASE ("at the start of the game the players have 6 cards", "[game]")

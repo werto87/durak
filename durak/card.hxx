@@ -5,6 +5,8 @@
 #include <optional>
 #include <sys/types.h>
 #include <vector>
+namespace durak
+{
 enum struct Type
 {
   hearts,
@@ -58,5 +60,5 @@ bool cardsHaveSameValue (std::vector<Card> const &cards);
 
 // takes an unsorted cards vector sorts it and returns a vector with cards for the indexes
 std::vector<Card> sortedCardIndexing (std::vector<Card> cards, std::vector<size_t> const &indexes);
-
+}
 #endif /* AE375AF6_DDFE_4D22_AD80_723EB970B8C7 */

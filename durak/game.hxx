@@ -12,6 +12,8 @@
 #include <pipes/pipes.hpp>
 #include <sys/types.h>
 #include <vector>
+namespace durak
+{
 
 enum struct PlayerRole
 {
@@ -104,5 +106,5 @@ std::vector<Card> generateCardDeck ();
 std::optional<Card> drawCard (std::vector<Card> &cardDeck);
 
 std::optional<Card> drawSpecificCard (std::vector<Card> &cardDeck, Card const &cardToDraw);
-
+}
 #endif /* B3662CAA_D812_46F7_8DD7_C85FCFAC47A4 */

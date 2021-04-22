@@ -2,7 +2,7 @@
 #define FE334B5B_FA67_454D_A6F5_A1CBF7D02BB7
 #include "durak/game.hxx"
 #include <string>
-namespace test
+namespace durak::test
 {
 std::vector<Card>
 testCardDeck ()

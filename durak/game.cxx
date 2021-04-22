@@ -9,6 +9,8 @@
 #include <random>
 #include <range/v3/range.hpp>
 #include <stdexcept>
+namespace durak
+{
 
 Game::Game (std::vector<std::string> &&playerNames) : cardDeck{ generateCardDeck () }
 {
@@ -409,4 +411,5 @@ Type
 Game::getTrump () const
 {
   return trump;
+}
 }

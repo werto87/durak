@@ -9,7 +9,7 @@
 #include <iterator>
 #include <sys/types.h>
 
-namespace test
+namespace durak::test
 {
 
 TEST_CASE ("smallest card value can not beat a card", "[beats]")

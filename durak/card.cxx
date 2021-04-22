@@ -8,6 +8,8 @@
 #include <range/v3/range.hpp>
 #include <range/v3/range/conversion.hpp>
 #include <range/v3/range_fwd.hpp>
+namespace durak
+{
 bool
 operator== (Card const &x, Card const &y)
 {
@@ -55,4 +57,5 @@ sortedCardIndexing (std::vector<Card> cards, std::vector<size_t> const &indexes)
   std::ranges::sort (cards);
   pipes::mux (ranges::to_vector (std::views::iota (size_t{ 1 }, cards.size () + 1)), cards) >>= pipes::filter ([&indexes] (size_t i, Card) { return indexes.end () != std::ranges::find (indexes, i); }) >>= pipes::transform ([] (size_t, Card const &card) { return card; }) >>= pipes::push_back (result);
   return result;
+}
 }

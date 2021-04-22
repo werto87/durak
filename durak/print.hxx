@@ -2,6 +2,10 @@
 #define CB3E895C_E721_4274_A037_FDB32C4DE314
 #include <iostream>
 #include <vector>
+
+namespace durak
+{
+
 struct Card;
 struct Player;
 class Game;
@@ -19,4 +23,5 @@ std::string defendingPlayerWithNameAndCardIndexValueAndType (Game const &game);
 std::string assistingPlayerWithNameAndCardIndexValueAndType (Game const &game);
 
 std::string tableAsString (Game const &game);
+}
 #endif /* CB3E895C_E721_4274_A037_FDB32C4DE314 */

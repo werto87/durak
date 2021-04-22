@@ -6,6 +6,10 @@
 #include <range/v3/range.hpp>
 #include <ranges>
 #include <sstream>
+
+namespace durak
+{
+
 std::ostream &
 operator<< (std::ostream &os, Card const &card)
 {
@@ -88,4 +92,5 @@ tableAsString (Game const &game)
         }
     }
   return cardsMessage.str ();
+}
 }

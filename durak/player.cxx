@@ -4,6 +4,8 @@
 #include <range/v3/range.hpp>
 #include <stdexcept>
 #include <string>
+namespace durak
+{
 void
 Player::putCards (std::vector<Card> const &cardsToPut, std::vector<std::pair<Card, std::optional<Card> > > &target)
 {
@@ -48,4 +50,5 @@ Player::dropCard (Card const &card)
     {
       return false;
     }
+}
 }
