@@ -40,10 +40,10 @@ conan_basic_setup(TARGETS)
 
 
 set(TARGET_NAME project)
-add_executable(${TARGET_NAME})
+add_library(${TARGET_NAME})
 
 ######## add sub dir
-add_subdirectory(src) 
+add_subdirectory(durak) 
 
 
 ####### link
@@ -70,10 +70,7 @@ IF(BUILD_TESTS)
     add_subdirectory(test) 
 ENDIF(BUILD_TESTS)
 
-# add main after  add_subdirectory(test) so we can take the sources from ${TARGET_NAME} and dont have to remove main.cxx from that list
-target_sources(${TARGET_NAME} PRIVATE 
-"main.cxx"
-)
+
  
 if (CMAKE_BINARY_DIR)
 target_compile_definitions(${TARGET_NAME} PRIVATE PATH_TO_BINARY="${CMAKE_BINARY_DIR}")

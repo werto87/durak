@@ -1,5 +1,5 @@
-#include "src/print.hxx"
-#include "src/game.hxx"
+#include "durak/print.hxx"
+#include "durak/game.hxx"
 #include <fmt/format.h>
 #include <magic_enum.hpp>
 #include <pipes/pipes.hpp>

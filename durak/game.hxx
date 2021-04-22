@@ -1,7 +1,7 @@
 #ifndef B3662CAA_D812_46F7_8DD7_C85FCFAC47A4
 #define B3662CAA_D812_46F7_8DD7_C85FCFAC47A4
 
-#include "src/player.hxx"
+#include "durak/player.hxx"
 #include <algorithm>
 #include <boost/assign.hpp>
 #include <boost/range/adaptor/indexed.hpp>

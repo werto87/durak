@@ -1,4 +1,4 @@
-#include "src/card.hxx"
+#include "durak/card.hxx"
 #include <algorithm>
 #include <cstddef>
 #include <pipes/pipes.hpp>

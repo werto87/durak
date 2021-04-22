@@ -1,6 +1,6 @@
 #ifndef A85D1720_A39F_43B7_B56C_7843E3A02A0D
 #define A85D1720_A39F_43B7_B56C_7843E3A02A0D
-#include "src/card.hxx"
+#include "durak/card.hxx"
 #include <algorithm>
 #include <cstddef>
 #include <sys/types.h>

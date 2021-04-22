@@ -1,6 +1,6 @@
-#include "src/game.hxx"
-#include "src/card.hxx"
-#include "src/print.hxx"
+#include "durak/game.hxx"
+#include "durak/card.hxx"
+#include "durak/print.hxx"
 #include "test/constant.hxx"
 #include <algorithm>
 #include <array>

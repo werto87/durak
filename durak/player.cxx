@@ -1,4 +1,4 @@
-#include "src/player.hxx"
+#include "durak/player.hxx"
 #include <pipes/dev_null.hpp>
 #include <pipes/pipes.hpp>
 #include <range/v3/range.hpp>

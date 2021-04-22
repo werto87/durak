@@ -1,5 +1,5 @@
-#include "src/player.hxx"
-#include "src/game.hxx"
+#include "durak/player.hxx"
+#include "durak/game.hxx"
 #include <algorithm>
 #include <array>
 #include <catch2/catch.hpp>

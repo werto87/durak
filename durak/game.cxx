@@ -1,6 +1,6 @@
-#include "src/game.hxx"
-#include "src/card.hxx"
-#include "src/player.hxx"
+#include "durak/game.hxx"
+#include "durak/card.hxx"
+#include "durak/player.hxx"
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
