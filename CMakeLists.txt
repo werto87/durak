@@ -39,7 +39,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
 
-set(TARGET_NAME project)
+set(TARGET_NAME durak)
 add_library(${TARGET_NAME})
 
 ######## add sub dir
