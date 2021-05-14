@@ -61,6 +61,7 @@ CONAN_PKG::range-v3
 CONAN_PKG::pipes
 CONAN_PKG::magic_enum
 CONAN_PKG::fmt
+CONAN_PKG::confu_boost
 )
 
 ####### create executable

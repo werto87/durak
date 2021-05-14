@@ -47,7 +47,14 @@ std::string
 attackingPlayerWithNameAndCardIndexValueAndType (Game const &game)
 {
   auto result = std::stringstream{};
-  result << "Attacking Player: " << game.getAttackingPlayer ().id << std::endl << "trump: " << magic_enum::enum_name (game.getTrump ()) << std::endl << cardsSortedByValueWithIndex (game.getAttackingPlayer ().getCards ());
+  if (game.getAttackingPlayer ())
+    {
+      result << "Attacking Player: " << game.getAttackingPlayer ().value ().id << std::endl << "trump: " << magic_enum::enum_name (game.getTrump ()) << std::endl << cardsSortedByValueWithIndex (game.getAttackingPlayer ().value ().getCards ());
+    }
+  else
+    {
+      result << "No Attacking Player";
+    }
   return result.str ();
 }
 
@@ -55,7 +62,15 @@ std::string
 defendingPlayerWithNameAndCardIndexValueAndType (Game const &game)
 {
   auto result = std::stringstream{};
-  result << "Defending Player: " << game.getDefendingPlayer ().id << std::endl << "trump: " << magic_enum::enum_name (game.getTrump ()) << std::endl << cardsSortedByValueWithIndex (game.getDefendingPlayer ().getCards ());
+  if (game.getDefendingPlayer ())
+    {
+      result << "Defending Player: " << game.getDefendingPlayer ().value ().id << std::endl << "trump: " << magic_enum::enum_name (game.getTrump ()) << std::endl << cardsSortedByValueWithIndex (game.getDefendingPlayer ().value ().getCards ());
+    }
+  else
+    {
+      result << "No Defending Player";
+    }
+
   return result.str ();
 }
 
@@ -63,7 +78,15 @@ std::string
 assistingPlayerWithNameAndCardIndexValueAndType (Game const &game)
 {
   auto result = std::stringstream{};
-  result << "Assisting Player: " << game.getAssistingPlayer ().id << std::endl << "trump: " << magic_enum::enum_name (game.getTrump ()) << std::endl << cardsSortedByValueWithIndex (game.getAssistingPlayer ().getCards ());
+  if (game.getAssistingPlayer ())
+    {
+      result << "Assisting Player: " << game.getAssistingPlayer ().value ().id << std::endl << "trump: " << magic_enum::enum_name (game.getTrump ()) << std::endl << cardsSortedByValueWithIndex (game.getAssistingPlayer ().value ().getCards ());
+    }
+  else
+    {
+      result << "No Assisting Player";
+    }
+
   return result.str ();
 }
 
@@ -74,9 +97,9 @@ tableAsString (Game const &game)
   // we need to sort and than add the index
   // maybe we skip beeten cards there is no reason that they have an index
   // maybe we put them at the start and the other cards and with an index at the end
-  auto result = std::vector<std::tuple<int, Card, std::optional<Card> > >{};
+  auto result = std::vector<std::tuple<int, Card, boost::optional<Card>>>{};
   pipes::mux (ranges::to<std::vector> (std::views::iota (size_t{}, game.getTable ().size ())), game.getTable ()) >>= pipes::transform ([] (auto index, auto &&card) { return std::make_tuple (index, card.first, card.second); }) >>= pipes::push_back (result);
-  std::ranges::sort (result, [] (std::tuple<int, Card, std::optional<Card> > const &x, std::tuple<int, Card, std::optional<Card> > const &y) { return std::get<1> (x) < std::get<1> (y); });
+  std::ranges::sort (result, [] (std::tuple<int, Card, boost::optional<Card>> const &x, std::tuple<int, Card, boost::optional<Card>> const &y) { return std::get<1> (x) < std::get<1> (y); });
   auto cardsMessage = std::stringstream{};
   cardsMessage << "Cards On Table sorted by Value with Index, Value and Type " << std::endl;
   for (auto const &card : result)

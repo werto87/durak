@@ -1,7 +1,9 @@
 #include "durak/game.hxx"
 #include "durak/card.hxx"
+#include "durak/gameData.hxx"
 #include "durak/player.hxx"
 #include <algorithm>
+#include <bits/ranges_algo.h>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
@@ -75,8 +77,8 @@ Game::playerStartsAttack (std::vector<Card> const &cards)
     {
       if (cardsHaveSameValue (cards))
         {
-          getAttackingPlayer ().putCards (cards, table);
-          if (getAttackingPlayer ().getCards ().empty ())
+          getAttackingPlayer ().value ().putCards (cards, table);
+          if (getAttackingPlayer ().value ().getCards ().empty ())
             {
               pass (PlayerRole::attack);
             }
@@ -139,8 +141,8 @@ Game::playerDefends (size_t indexFromCardOnTheTable, Card const &card)
   if (not table.at (indexFromCardOnTheTable).second && beats (cardToBeat, card, trump))
     {
       table.at (indexFromCardOnTheTable).second = card;
-      getDefendingPlayer ().dropCard ({ card });
-      if (getDefendingPlayer ().getCards ().empty ())
+      getDefendingPlayer ().value ().dropCard ({ card });
+      if (getDefendingPlayer ().value ().getCards ().empty ())
         {
           nextRound (false);
         }
@@ -160,7 +162,7 @@ Game::playerDefends (size_t indexFromCardOnTheTable, Card const &card)
 void
 Game::defendingPlayerTakesAllCardsFromTheTable ()
 {
-  getDefendingPlayer ().takeCards (getTableAsVector ());
+  getDefendingPlayer ().value ().takeCards (getTableAsVector ());
   nextRound (true);
 }
 
@@ -195,7 +197,7 @@ Game::getPlayers () const
   return players;
 }
 
-std::vector<std::pair<Card, std::optional<Card> > > const &
+std::vector<std::pair<Card, boost::optional<Card>>> const &
 Game::getTable () const
 {
   return table;
@@ -204,21 +206,21 @@ Game::getTable () const
 size_t
 Game::countOfNotBeatenCardsOnTable () const
 {
-  return std::accumulate (table.begin (), table.end (), size_t{ 0 }, [] (auto const &x, std::pair<Card, std::optional<Card> > const &y) { return x + (y.second.has_value () ? 0 : 1); });
+  return std::accumulate (table.begin (), table.end (), size_t{ 0 }, [] (auto const &x, std::pair<Card, boost::optional<Card>> const &y) { return x + (y.second.has_value () ? 0 : 1); });
 }
 
-std::vector<std::pair<size_t, Card> >
+std::vector<std::pair<size_t, Card>>
 Game::cardsNotBeatenOnTableWithIndex () const
 {
-  auto results = std::vector<std::pair<size_t, Card> >{};
-  pipes::mux (ranges::to<std::vector> (std::views::iota (size_t{}, getTable ().size ())), getTable ()) >>= pipes::filter ([] (int, std::pair<Card, std::optional<Card> > b) { return not b.second.has_value (); }) >>= pipes::transform ([] (int a, std::pair<Card, std::optional<Card> > b) { return std::make_pair (a, b.first); }) >>= pipes::push_back (results);
+  auto results = std::vector<std::pair<size_t, Card>>{};
+  pipes::mux (ranges::to<std::vector> (std::views::iota (size_t{}, getTable ().size ())), getTable ()) >>= pipes::filter ([] (int, std::pair<Card, boost::optional<Card>> b) { return not b.second.has_value (); }) >>= pipes::transform ([] (int a, std::pair<Card, boost::optional<Card>> b) { return std::make_pair (a, b.first); }) >>= pipes::push_back (results);
   return results;
 }
 
 size_t
 Game::cardsAllowedToPlaceOnTable () const
 {
-  return getDefendingPlayer ().getCards ().size () - countOfNotBeatenCardsOnTable ();
+  return getDefendingPlayer ().value ().getCards ().size () - countOfNotBeatenCardsOnTable ();
 }
 
 std::vector<Card>
@@ -253,19 +255,20 @@ Game::calculateNextRoles (bool attackSuccess)
 void
 Game::drawCards ()
 {
+  // TODO get player functions returns optional we can use this instead off size
   if (players.size () >= 3)
     {
-      if (getDefendingPlayer ().getCards ().size () < numberOfCardsPlayerShouldHave)
+      if (getDefendingPlayer ().value ().getCards ().size () < numberOfCardsPlayerShouldHave)
         {
-          playerDrawsCardsFromDeck (players.at (static_cast<size_t> (PlayerRole::defend)), numberOfCardsPlayerShouldHave - getDefendingPlayer ().getCards ().size ());
+          playerDrawsCardsFromDeck (players.at (static_cast<size_t> (PlayerRole::defend)), numberOfCardsPlayerShouldHave - getDefendingPlayer ().value ().getCards ().size ());
         }
-      if (getAssistingPlayer ().getCards ().size () < numberOfCardsPlayerShouldHave)
+      if (getAssistingPlayer ().value ().getCards ().size () < numberOfCardsPlayerShouldHave)
         {
-          playerDrawsCardsFromDeck (players.at (static_cast<size_t> (PlayerRole::assistAttacker)), numberOfCardsPlayerShouldHave - getAssistingPlayer ().getCards ().size ());
+          playerDrawsCardsFromDeck (players.at (static_cast<size_t> (PlayerRole::assistAttacker)), numberOfCardsPlayerShouldHave - getAssistingPlayer ().value ().getCards ().size ());
         }
-      if (getAttackingPlayer ().getCards ().size () < numberOfCardsPlayerShouldHave)
+      if (getAttackingPlayer ().value ().getCards ().size () < numberOfCardsPlayerShouldHave)
         {
-          playerDrawsCardsFromDeck (players.at (static_cast<size_t> (PlayerRole::attack)), numberOfCardsPlayerShouldHave - getAttackingPlayer ().getCards ().size ());
+          playerDrawsCardsFromDeck (players.at (static_cast<size_t> (PlayerRole::attack)), numberOfCardsPlayerShouldHave - getAttackingPlayer ().value ().getCards ().size ());
         }
     }
   if (players.size () == 2)
@@ -284,7 +287,6 @@ Game::drawCards ()
 void
 Game::nextRound (bool attackingSuccess)
 {
-  std::cout << "NEW ROUND############################################################################################" << std::endl;
   table.clear ();
   round++;
   attackStarted = false;
@@ -294,41 +296,83 @@ Game::nextRound (bool attackingSuccess)
   gameOver = checkIfGameIsOver ();
   calculateNextRoles (attackingSuccess);
 }
-
-Player const &
+// TODO rework this into boost::optional<Player&>
+boost::optional<const Player &>
 Game::getDefendingPlayer () const
 {
-  return players.at (static_cast<size_t> (PlayerRole::defend));
+  if (players.size () > static_cast<size_t> (PlayerRole::defend))
+    {
+      return players.at (static_cast<size_t> (PlayerRole::defend));
+    }
+  else
+    {
+      return {};
+    }
 }
 
-Player const &
+boost::optional<const Player &>
 Game::getAssistingPlayer () const
 {
-  return players.at (static_cast<size_t> (PlayerRole::assistAttacker));
+  if (players.size () > static_cast<size_t> (PlayerRole::assistAttacker))
+    {
+      return players.at (static_cast<size_t> (PlayerRole::assistAttacker));
+    }
+  else
+    {
+      return {};
+    }
 }
 
-Player const &
+boost::optional<const Player &>
 Game::getAttackingPlayer () const
 {
-  return players.at (static_cast<size_t> (PlayerRole::attack));
+  if (players.size () > static_cast<size_t> (PlayerRole::attack))
+    {
+      return players.at (static_cast<size_t> (PlayerRole::attack));
+    }
+  else
+    {
+      return {};
+    }
 }
 
-Player &
+boost::optional<Player &>
 Game::getDefendingPlayer ()
 {
-  return players.at (static_cast<size_t> (PlayerRole::defend));
+  if (players.size () > static_cast<size_t> (PlayerRole::defend))
+    {
+      return players.at (static_cast<size_t> (PlayerRole::defend));
+    }
+  else
+    {
+      return {};
+    }
 }
 
-Player &
+boost::optional<Player &>
 Game::getAssistingPlayer ()
 {
-  return players.at (static_cast<size_t> (PlayerRole::assistAttacker));
+  if (players.size () > static_cast<size_t> (PlayerRole::assistAttacker))
+    {
+      return players.at (static_cast<size_t> (PlayerRole::assistAttacker));
+    }
+  else
+    {
+      return {};
+    }
 }
 
-Player &
+boost::optional<Player &>
 Game::getAttackingPlayer ()
 {
-  return players.at (static_cast<size_t> (PlayerRole::attack));
+  if (players.size () > static_cast<size_t> (PlayerRole::attack))
+    {
+      return players.at (static_cast<size_t> (PlayerRole::attack));
+    }
+  else
+    {
+      return {};
+    }
 }
 
 size_t
@@ -349,7 +393,7 @@ Game::checkIfGameIsOver () const
   return players.size () <= 1;
 }
 
-std::optional<Player>
+boost::optional<Player>
 Game::durak () const
 {
   if (not checkIfGameIsOver ()) throw std::logic_error{ "calling durak and game is not over checkIfGameIsOver () == false" };
@@ -381,10 +425,10 @@ generateCardDeck ()
   return cardDeck;
 }
 
-std::optional<Card>
+boost::optional<Card>
 drawCard (std::vector<Card> &cardDeck)
 {
-  std::optional<Card> card{};
+  boost::optional<Card> card{};
   if (!cardDeck.empty ())
     {
       card = std::move (cardDeck.back ());
@@ -393,10 +437,10 @@ drawCard (std::vector<Card> &cardDeck)
   return card;
 }
 
-std::optional<Card>
+boost::optional<Card>
 drawSpecificCard (std::vector<Card> &cardDeck, Card const &cardToDraw)
 {
-  auto result = std::optional<Card>{};
+  auto result = boost::optional<Card>{};
   // try to find and if found return it and remove it from cardDeck
   auto card = std::find (cardDeck.begin (), cardDeck.end (), cardToDraw);
   if (card != cardDeck.end ())
@@ -404,6 +448,39 @@ drawSpecificCard (std::vector<Card> &cardDeck, Card const &cardToDraw)
       result = std::move (*card);
       cardDeck.erase (card);
     }
+  return result;
+}
+
+GameData
+Game::getGameData () const
+{
+  auto result = GameData{};
+  result.trump = trump;
+  result.table = table;
+  auto assistingPlayer = getAssistingPlayer ();
+  auto attackingPlayer = getAttackingPlayer ();
+  auto defendingPlayer = getDefendingPlayer ();
+  std::ranges::transform (players, std::back_inserter (result.players), [&] (Player const &player) {
+    auto playerRole = PlayerRole::waiting;
+    if (assistingPlayer && player.id == assistingPlayer.value ().id)
+      {
+        playerRole = PlayerRole::assistAttacker;
+      }
+    else if (attackingPlayer && player.id == attackingPlayer.value ().id)
+      {
+        playerRole = PlayerRole::attack;
+      }
+    else if (defendingPlayer && player.id == defendingPlayer.value ().id)
+      {
+        playerRole = PlayerRole::defend;
+      }
+    auto playerData = PlayerData{};
+    playerData.name = player.id;
+    // playerData.cards = player.getCards ();
+    std::ranges::transform (player.getCards (), std::back_inserter (playerData.cards), [] (durak::Card const &card) { return card; });
+    playerData.playerRole = playerRole;
+    return playerData;
+  });
   return result;
 }
 

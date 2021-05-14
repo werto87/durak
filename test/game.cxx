@@ -1,5 +1,6 @@
 #include "durak/game.hxx"
 #include "durak/card.hxx"
+#include "durak/gameData.hxx"
 #include "durak/print.hxx"
 #include "test/constant.hxx"
 #include <algorithm>
@@ -103,7 +104,7 @@ TEST_CASE ("pass player beats all cards attack and def passes table gets cleared
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
   game.playerStartsAttack ({ { 4, Type::clubs } });
   REQUIRE (game.countOfNotBeatenCardsOnTable () == 1);
-  REQUIRE (game.playerDefends (0, game.getDefendingPlayer ().getCards ().at (3)));
+  REQUIRE (game.playerDefends (0, game.getDefendingPlayer ().value ().getCards ().at (3)));
   REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
   game.pass (PlayerRole::attack);
   game.pass (PlayerRole::assistAttacker);
@@ -116,7 +117,7 @@ TEST_CASE ("try to play the game", "[game]")
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
   game.playerStartsAttack ({ { 4, Type::clubs } });
   game.countOfNotBeatenCardsOnTable ();
-  game.playerDefends (0, game.getDefendingPlayer ().getCards ().at (3));
+  game.playerDefends (0, game.getDefendingPlayer ().value ().getCards ().at (3));
   game.countOfNotBeatenCardsOnTable ();
   game.pass (PlayerRole::attack);
   game.pass (PlayerRole::assistAttacker);
@@ -124,13 +125,36 @@ TEST_CASE ("try to play the game", "[game]")
   game.getRound ();
   while (not game.checkIfGameIsOver ())
     {
-
-      game.playerStartsAttack ({ game.getAttackingPlayer ().getCards ().at (0) });
+      game.playerStartsAttack ({ game.getAttackingPlayer ().value ().getCards ().at (0) });
       game.defendingPlayerTakesAllCardsFromTheTable ();
     }
   REQUIRE (game.durak ());
 }
 
-TEST_CASE ("playground", "[game]") {}
+TEST_CASE ("getGameData", "[game]")
+{
+  auto game = Game{ { "player1", "player2" }, testCardDeck () };
+  game.playerStartsAttack ({ { 4, Type::clubs } });
+  REQUIRE (game.countOfNotBeatenCardsOnTable () == 1);
+  REQUIRE (game.playerDefends (0, game.getDefendingPlayer ().value ().getCards ().at (3)));
+  REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
+  game.pass (PlayerRole::attack);
+  game.pass (PlayerRole::assistAttacker);
+  REQUIRE (game.getTable ().size () == 0);
+  REQUIRE (game.getRound () == 2);
+  auto gameData = game.getGameData ();
+  REQUIRE (gameData.players.size () == game.getPlayers ().size ());
+  REQUIRE (gameData.table.size () == game.getTable ().size ());
+  REQUIRE (gameData.trump == game.getTrump ());
+}
+
+TEST_CASE ("playground", "[game]")
+{
+
+  auto playerData = PlayerData{};
+  std::cout << confu_boost::toString (playerData) << std::endl;
+  auto gameData = GameData{};
+  std::cout << confu_boost::toString (gameData) << std::endl;
+}
 
 }

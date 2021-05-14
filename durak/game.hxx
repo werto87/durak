@@ -1,6 +1,7 @@
 #ifndef B3662CAA_D812_46F7_8DD7_C85FCFAC47A4
 #define B3662CAA_D812_46F7_8DD7_C85FCFAC47A4
 
+#include "durak/gameData.hxx"
 #include "durak/player.hxx"
 #include <algorithm>
 #include <boost/assign.hpp>
@@ -12,15 +13,9 @@
 #include <pipes/pipes.hpp>
 #include <sys/types.h>
 #include <vector>
+
 namespace durak
 {
-
-enum struct PlayerRole
-{
-  attack,
-  defend,
-  assistAttacker
-};
 
 class Game
 {
@@ -46,35 +41,37 @@ public:
 
   std::vector<Player> const &getPlayers () const;
 
-  std::vector<std::pair<Card, std::optional<Card> > > const &getTable () const;
+  std::vector<std::pair<Card, boost::optional<Card>>> const &getTable () const;
 
   size_t countOfNotBeatenCardsOnTable () const;
 
-  std::vector<std::pair<size_t, Card> > cardsNotBeatenOnTableWithIndex () const;
+  std::vector<std::pair<size_t, Card>> cardsNotBeatenOnTableWithIndex () const;
 
   size_t cardsAllowedToPlaceOnTable () const;
 
   size_t getRound () const;
 
-  Player const &getAttackingPlayer () const;
+  boost::optional<const Player &> getAttackingPlayer () const;
 
-  Player const &getAssistingPlayer () const;
+  boost::optional<const Player &> getAssistingPlayer () const;
 
-  Player const &getDefendingPlayer () const;
+  boost::optional<const Player &> getDefendingPlayer () const;
 
-  Player &getAttackingPlayer ();
+  boost::optional<Player &> getAttackingPlayer ();
 
-  Player &getAssistingPlayer ();
+  boost::optional<Player &> getAssistingPlayer ();
 
-  Player &getDefendingPlayer ();
+  boost::optional<Player &> getDefendingPlayer ();
 
   bool getAttackStarted () const;
 
-  std::optional<Player> durak () const;
+  boost::optional<Player> durak () const;
 
   bool checkIfGameIsOver () const;
 
   Type getTrump () const;
+
+  GameData getGameData () const;
 
 private:
   void nextRound (bool attackingSuccess);
@@ -91,7 +88,7 @@ private:
 
   std::vector<Card> cardDeck{};
   std::vector<Player> players{};
-  std::vector<std::pair<Card, std::optional<Card> > > table{};
+  std::vector<std::pair<Card, boost::optional<Card>>> table{};
   Type trump{};
   bool attackStarted = false;
   bool gameOver = false;
@@ -103,8 +100,8 @@ private:
 
 std::vector<Card> generateCardDeck ();
 
-std::optional<Card> drawCard (std::vector<Card> &cardDeck);
+boost::optional<Card> drawCard (std::vector<Card> &cardDeck);
 
-std::optional<Card> drawSpecificCard (std::vector<Card> &cardDeck, Card const &cardToDraw);
+boost::optional<Card> drawSpecificCard (std::vector<Card> &cardDeck, Card const &cardToDraw);
 }
 #endif /* B3662CAA_D812_46F7_8DD7_C85FCFAC47A4 */

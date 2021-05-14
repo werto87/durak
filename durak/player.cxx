@@ -7,10 +7,10 @@
 namespace durak
 {
 void
-Player::putCards (std::vector<Card> const &cardsToPut, std::vector<std::pair<Card, std::optional<Card> > > &target)
+Player::putCards (std::vector<Card> const &cardsToPut, std::vector<std::pair<Card, boost::optional<Card>>> &target)
 {
   auto cardsToMove = std::stable_partition (cards.begin (), cards.end (), [&cardsToPut] (Card const &card) { return std::find (cardsToPut.begin (), cardsToPut.end (), card) == cardsToPut.end (); });
-  std::for_each (cardsToMove, cards.end (), [&target] (Card &card) { target.emplace_back (std::pair<Card, std::optional<Card> >{ std::move (card), {} }); });
+  std::for_each (cardsToMove, cards.end (), [&target] (Card &card) { target.emplace_back (std::pair<Card, boost::optional<Card>>{ std::move (card), {} }); });
   cards.erase (cardsToMove, cards.end ());
 }
 
