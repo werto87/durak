@@ -73,17 +73,24 @@ Game::rewokePass (PlayerRole player)
 bool
 Game::playerStartsAttack (std::vector<Card> const &cards)
 {
-  if (cardsAllowedToPlaceOnTable () >= cards.size ())
+  if (auto attackingPlayer = getAttackingPlayer ())
     {
-      if (cardsHaveSameValue (cards))
+      if (cardsAllowedToPlaceOnTable () >= cards.size ())
         {
-          getAttackingPlayer ().value ().putCards (cards, table);
-          if (getAttackingPlayer ().value ().getCards ().empty ())
+          if (cardsHaveSameValue (cards))
             {
-              pass (PlayerRole::attack);
+              attackingPlayer.value ().putCards (cards, table);
+              if (attackingPlayer.value ().getCards ().empty ())
+                {
+                  pass (PlayerRole::attack);
+                }
+              attackStarted = true;
+              return true;
             }
-          attackStarted = true;
-          return true;
+          else
+            {
+              return false;
+            }
         }
       else
         {
@@ -163,11 +170,19 @@ Game::playerDefends (Card const &cardToBeat, Card const &card)
     }
 }
 
-void
+bool
 Game::defendingPlayerTakesAllCardsFromTheTable ()
 {
-  getDefendingPlayer ().value ().takeCards (getTableAsVector ());
-  nextRound (true);
+  if (auto defendingPlayer = getDefendingPlayer ())
+    {
+      defendingPlayer.value ().takeCards (getTableAsVector ());
+      nextRound (true);
+      return true;
+    }
+  else
+    {
+      return false;
+    }
 }
 
 void

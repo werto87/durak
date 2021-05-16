@@ -37,7 +37,7 @@ public:
   // defending player can try to beat card on the table
   bool playerDefends (Card const &cardToBeat, Card const &card);
 
-  void defendingPlayerTakesAllCardsFromTheTable ();
+  bool defendingPlayerTakesAllCardsFromTheTable ();
 
   std::vector<Player> const &getPlayers () const;
 
