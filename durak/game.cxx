@@ -220,7 +220,8 @@ Game::cardsNotBeatenOnTableWithIndex () const
 size_t
 Game::cardsAllowedToPlaceOnTable () const
 {
-  return getDefendingPlayer ().value ().getCards ().size () - countOfNotBeatenCardsOnTable ();
+  auto defendingPlayer = getDefendingPlayer ();
+  return defendingPlayer ? defendingPlayer.value ().getCards ().size () - countOfNotBeatenCardsOnTable () : 0;
 }
 
 std::vector<Card>
