@@ -173,7 +173,7 @@ Game::playerDefends (Card const &cardToBeat, Card const &card)
 bool
 Game::defendingPlayerTakesAllCardsFromTheTable ()
 {
-  if (auto defendingPlayer = getDefendingPlayer ())
+  if (auto defendingPlayer = getDefendingPlayer (); defendingPlayer && not table.empty ())
     {
       defendingPlayer.value ().takeCards (getTableAsVector ());
       nextRound (true);
@@ -316,7 +316,6 @@ Game::nextRound (bool attackingSuccess)
   gameOver = checkIfGameIsOver ();
   calculateNextRoles (attackingSuccess);
 }
-// TODO rework this into boost::optional<Player&>
 boost::optional<const Player &>
 Game::getDefendingPlayer () const
 {

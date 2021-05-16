@@ -128,6 +128,8 @@ TEST_CASE ("try to play the game", "[game]")
     {
       game.playerStartsAttack ({ game.getAttackingPlayer ().value ().getCards ().at (0) });
       game.defendingPlayerTakesAllCardsFromTheTable ();
+      game.pass (PlayerRole::attack);
+      std::cout << game.getRound () << std::endl;
     }
   REQUIRE (game.durak ());
 }
