@@ -131,27 +131,31 @@ Game::playerAssists (PlayerRole player, std::vector<Card> const &cards)
 }
 
 bool
-Game::playerDefends (size_t indexFromCardOnTheTable, Card const &card)
+Game::playerDefends (Card const &cardToBeat, Card const &card)
 {
-  if (table.size () <= indexFromCardOnTheTable)
+  if (auto defendingPlayer = getDefendingPlayer ())
     {
-      return false;
-    }
-  auto cardToBeat = table.at (indexFromCardOnTheTable).first;
-  if (not table.at (indexFromCardOnTheTable).second && beats (cardToBeat, card, trump))
-    {
-      table.at (indexFromCardOnTheTable).second = card;
-      getDefendingPlayer ().value ().dropCard ({ card });
-      if (getDefendingPlayer ().value ().getCards ().empty ())
+      if (auto cardToBeatItr = std::ranges::find_if (table, [&cardToBeat] (auto const &cardAndOptionalCard) { return cardAndOptionalCard.first == cardToBeat; }); cardToBeatItr != table.end () && not cardToBeatItr->second && beats (cardToBeatItr->first, card, trump))
         {
-          nextRound (false);
+          if (defendingPlayer.value ().dropCard (card))
+            {
+              cardToBeatItr->second = card;
+              if (defendingPlayer.value ().getCards ().empty ())
+                {
+                  nextRound (false);
+                }
+              else
+                {
+                  rewokePass (PlayerRole::attack);
+                  rewokePass (PlayerRole::assistAttacker);
+                }
+            }
+          return true;
         }
       else
         {
-          rewokePass (PlayerRole::attack);
-          rewokePass (PlayerRole::assistAttacker);
+          return false;
         }
-      return true;
     }
   else
     {

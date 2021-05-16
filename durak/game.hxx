@@ -35,7 +35,7 @@ public:
   bool playerAssists (PlayerRole playerRole, std::vector<Card> const &cards);
 
   // defending player can try to beat card on the table
-  bool playerDefends (size_t indexFromCardOnTheTable, Card const &card);
+  bool playerDefends (Card const &cardToBeat, Card const &card);
 
   void defendingPlayerTakesAllCardsFromTheTable ();
 

@@ -79,15 +79,16 @@ TEST_CASE ("cardsNotBeatenOnTableWithIndex table with two cards which are not be
 TEST_CASE ("playerDefends player beats one card of two cards on the table", "[game]")
 {
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
+
   game.playerStartsAttack ({ { 4, Type::spades }, { 4, Type::clubs } });
-  REQUIRE (game.playerDefends (0, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (3)));
+  REQUIRE (game.playerDefends (game.getTable ().at (0).first, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (3)));
 }
 
 TEST_CASE ("playerDefends value to low", "[game]")
 {
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
   game.playerStartsAttack ({ { 4, Type::spades }, { 4, Type::clubs } });
-  REQUIRE_FALSE (game.playerDefends (0, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (5)));
+  REQUIRE_FALSE (game.playerDefends (game.getTable ().at (0).first, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (5)));
 }
 
 TEST_CASE ("playerDefends player beats all cards", "[game]")
@@ -95,7 +96,7 @@ TEST_CASE ("playerDefends player beats all cards", "[game]")
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
   game.playerStartsAttack ({ { 4, Type::clubs } });
   REQUIRE (game.countOfNotBeatenCardsOnTable () == 1);
-  REQUIRE (game.playerDefends (0, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (3)));
+  REQUIRE (game.playerDefends (game.getTable ().at (0).first, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (3)));
   REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
 }
 
@@ -104,7 +105,7 @@ TEST_CASE ("pass player beats all cards attack and def passes table gets cleared
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
   game.playerStartsAttack ({ { 4, Type::clubs } });
   REQUIRE (game.countOfNotBeatenCardsOnTable () == 1);
-  REQUIRE (game.playerDefends (0, game.getDefendingPlayer ().value ().getCards ().at (3)));
+  REQUIRE (game.playerDefends (game.getTable ().at (0).first, game.getDefendingPlayer ().value ().getCards ().at (3)));
   REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
   game.pass (PlayerRole::attack);
   game.pass (PlayerRole::assistAttacker);
@@ -117,7 +118,7 @@ TEST_CASE ("try to play the game", "[game]")
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
   game.playerStartsAttack ({ { 4, Type::clubs } });
   game.countOfNotBeatenCardsOnTable ();
-  game.playerDefends (0, game.getDefendingPlayer ().value ().getCards ().at (3));
+  game.playerDefends (game.getTable ().at (0).first, game.getDefendingPlayer ().value ().getCards ().at (3));
   game.countOfNotBeatenCardsOnTable ();
   game.pass (PlayerRole::attack);
   game.pass (PlayerRole::assistAttacker);
@@ -136,7 +137,7 @@ TEST_CASE ("getGameData", "[game]")
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
   game.playerStartsAttack ({ { 4, Type::clubs } });
   REQUIRE (game.countOfNotBeatenCardsOnTable () == 1);
-  REQUIRE (game.playerDefends (0, game.getDefendingPlayer ().value ().getCards ().at (3)));
+  REQUIRE (game.playerDefends (game.getTable ().at (0).first, game.getDefendingPlayer ().value ().getCards ().at (3)));
   REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
   game.pass (PlayerRole::attack);
   game.pass (PlayerRole::assistAttacker);
