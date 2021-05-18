@@ -1,4 +1,4 @@
- target_sources(${TARGET_NAME} PRIVATE 
+target_sources(${TARGET_NAME} PRIVATE 
  card.hxx
  card.cxx
  game.hxx

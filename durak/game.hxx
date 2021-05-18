@@ -13,20 +13,16 @@
 #include <pipes/pipes.hpp>
 #include <sys/types.h>
 #include <vector>
-
 namespace durak
 {
 
 class Game
 {
 public:
+  Game () = default;
   explicit Game (std::vector<std::string> &&playerNames);
 
   Game (std::vector<std::string> &&playerNames, std::vector<Card> &&cards);
-
-  bool pass (PlayerRole playerRole);
-
-  void rewokePass (PlayerRole playerRole);
 
   // attack starts round and can only be used by playr with role attack
   bool playerStartsAttack (std::vector<Card> const &cards);
@@ -36,8 +32,6 @@ public:
 
   // defending player can try to beat card on the table
   bool playerDefends (Card const &cardToBeat, Card const &card);
-
-  bool defendingPlayerTakesAllCardsFromTheTable ();
 
   std::vector<Player> const &getPlayers () const;
 
@@ -73,8 +67,12 @@ public:
 
   GameData getGameData () const;
 
-private:
+  PlayerRole getRoleForName (std::string const &name) const;
+
   void nextRound (bool attackingSuccess);
+
+private:
+  bool defendingPlayerTakesAllCardsFromTheTable ();
 
   std::vector<Card> getTableAsVector ();
 
@@ -92,8 +90,6 @@ private:
   Type trump{};
   bool attackStarted = false;
   bool gameOver = false;
-  bool attackingPlayerPass = false;
-  bool assistingPlayerPass = false;
   size_t round{ 1 };
   size_t numberOfCardsPlayerShouldHave{ 6 };
 };

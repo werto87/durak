@@ -39,38 +39,6 @@ Game::Game (std::vector<std::string> &&playerNames, std::vector<Card> &&cards) :
 }
 
 bool
-Game::pass (PlayerRole player)
-{
-  if ((player == PlayerRole::attack) && attackStarted)
-    {
-      attackingPlayerPass = true;
-    }
-  else if (player == PlayerRole::assistAttacker)
-    {
-      assistingPlayerPass = true;
-    }
-  if (((players.size () == 2) && attackingPlayerPass && (countOfNotBeatenCardsOnTable () == 0)) || (attackingPlayerPass && assistingPlayerPass && (countOfNotBeatenCardsOnTable () == 0)))
-    {
-      nextRound (false);
-      return true;
-    }
-  return false;
-}
-
-void
-Game::rewokePass (PlayerRole player)
-{
-  if (player == PlayerRole::attack)
-    {
-      attackingPlayerPass = false;
-    }
-  else if (player == PlayerRole::assistAttacker)
-    {
-      assistingPlayerPass = false;
-    }
-}
-
-bool
 Game::playerStartsAttack (std::vector<Card> const &cards)
 {
   if (auto attackingPlayer = getAttackingPlayer ())
@@ -82,7 +50,7 @@ Game::playerStartsAttack (std::vector<Card> const &cards)
               attackingPlayer.value ().putCards (cards, table);
               if (attackingPlayer.value ().getCards ().empty ())
                 {
-                  pass (PlayerRole::attack);
+                  //   passStateMachine.process_event (attackPass{});
                 }
               attackStarted = true;
               return true;
@@ -130,7 +98,22 @@ Game::playerAssists (PlayerRole player, std::vector<Card> const &cards)
           players.at (static_cast<size_t> (player)).putCards (cards, table);
           if (players.at (static_cast<size_t> (player)).getCards ().empty ())
             {
-              pass (player);
+              if (player == PlayerRole::attack)
+                {
+                  //  passStateMachine.process_event (attackPass{});
+                  if (auto assistingPlayer = getAssistingPlayer (); not assistingPlayer->getCards ().empty ())
+                    {
+                      //    passStateMachine.process_event (rewokePassAssist{});
+                    }
+                }
+              else
+                {
+                  //  passStateMachine.process_event (assistPass{});
+                  if (auto attackingPlayer = getAttackingPlayer (); not attackingPlayer->getCards ().empty ())
+                    {
+                      //     passStateMachine.process_event (rewokePassAttack{});
+                    }
+                }
             }
         }
     }
@@ -147,15 +130,6 @@ Game::playerDefends (Card const &cardToBeat, Card const &card)
           if (defendingPlayer.value ().dropCard (card))
             {
               cardToBeatItr->second = card;
-              if (defendingPlayer.value ().getCards ().empty ())
-                {
-                  nextRound (false);
-                }
-              else
-                {
-                  rewokePass (PlayerRole::attack);
-                  rewokePass (PlayerRole::assistAttacker);
-                }
             }
           return true;
         }
@@ -176,7 +150,6 @@ Game::defendingPlayerTakesAllCardsFromTheTable ()
   if (auto defendingPlayer = getDefendingPlayer (); defendingPlayer && not table.empty ())
     {
       defendingPlayer.value ().takeCards (getTableAsVector ());
-      nextRound (true);
       return true;
     }
   else
@@ -307,11 +280,10 @@ Game::drawCards ()
 void
 Game::nextRound (bool attackingSuccess)
 {
+  if (attackingSuccess) defendingPlayerTakesAllCardsFromTheTable ();
   table.clear ();
   round++;
   attackStarted = false;
-  rewokePass (PlayerRole::attack);
-  rewokePass (PlayerRole::defend);
   drawCards ();
   gameOver = checkIfGameIsOver ();
   calculateNextRoles (attackingSuccess);
@@ -501,6 +473,30 @@ Game::getGameData () const
     return playerData;
   });
   return result;
+}
+
+PlayerRole
+Game::getRoleForName (std::string const &name) const
+{
+  auto defendingPlayer = getDefendingPlayer ();
+  auto attackingPlayer = getAttackingPlayer ();
+  auto assistingPlayer = getAssistingPlayer ();
+  if (defendingPlayer && defendingPlayer->id == name)
+    {
+      return PlayerRole::defend;
+    }
+  else if (attackingPlayer && attackingPlayer->id == name)
+    {
+      return PlayerRole::attack;
+    }
+  else if (assistingPlayer && assistingPlayer->id == name)
+    {
+      return PlayerRole::assistAttacker;
+    }
+  else
+    {
+      return PlayerRole::waiting;
+    }
 }
 
 Type
