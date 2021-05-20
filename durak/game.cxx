@@ -472,6 +472,7 @@ Game::getGameData () const
     playerData.playerRole = playerRole;
     return playerData;
   });
+  result.round = getRound ();
   return result;
 }
 

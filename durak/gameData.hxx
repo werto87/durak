@@ -38,10 +38,11 @@ struct GameData
   Type trump{};
   std::vector<std::pair<Card, boost::optional<Card>>> table{};
   std::vector<PlayerData> players{};
+  size_t round{};
 };
 }
 
-BOOST_FUSION_ADAPT_STRUCT (durak::GameData, trump, table, players)
+BOOST_FUSION_ADAPT_STRUCT (durak::GameData, trump, table, players, round)
 
 BOOST_SERIALIZATION_BOILER_PLATE (durak::Type)
 BOOST_SERIALIZATION_BOILER_PLATE (durak::PlayerRole)
