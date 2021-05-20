@@ -59,6 +59,7 @@ public:
 
   bool getAttackStarted () const;
 
+  // empty optional means no player lost
   boost::optional<Player> durak () const;
 
   bool checkIfGameIsOver () const;

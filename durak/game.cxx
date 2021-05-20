@@ -48,10 +48,6 @@ Game::playerStartsAttack (std::vector<Card> const &cards)
           if (cardsHaveSameValue (cards))
             {
               attackingPlayer.value ().putCards (cards, table);
-              if (attackingPlayer.value ().getCards ().empty ())
-                {
-                  //   passStateMachine.process_event (attackPass{});
-                }
               attackStarted = true;
               return true;
             }
@@ -96,25 +92,6 @@ Game::playerAssists (PlayerRole player, std::vector<Card> const &cards)
         {
           result = true;
           players.at (static_cast<size_t> (player)).putCards (cards, table);
-          if (players.at (static_cast<size_t> (player)).getCards ().empty ())
-            {
-              if (player == PlayerRole::attack)
-                {
-                  //  passStateMachine.process_event (attackPass{});
-                  if (auto assistingPlayer = getAssistingPlayer (); not assistingPlayer->getCards ().empty ())
-                    {
-                      //    passStateMachine.process_event (rewokePassAssist{});
-                    }
-                }
-              else
-                {
-                  //  passStateMachine.process_event (assistPass{});
-                  if (auto attackingPlayer = getAttackingPlayer (); not attackingPlayer->getCards ().empty ())
-                    {
-                      //     passStateMachine.process_event (rewokePassAttack{});
-                    }
-                }
-            }
         }
     }
   return result;
