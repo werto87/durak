@@ -358,20 +358,24 @@ Game::getAttackStarted () const
 bool
 Game::checkIfGameIsOver () const
 {
-  return players.size () <= 1;
+  return players.size () <= 1 || (cardDeck.empty () && std::ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ());
 }
 
 boost::optional<Player>
 Game::durak () const
 {
   if (not checkIfGameIsOver ()) throw std::logic_error{ "calling durak and game is not over checkIfGameIsOver () == false" };
-  if (players.empty ())
+  if (cardDeck.empty () && std::ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ())
     {
       return {};
     }
-  else
+  else if (players.size () == 1)
     {
       return players.front ();
+    }
+  else
+    {
+      throw std::logic_error{ "error while calculating loser in  durak::Game::durak ()" };
     }
 }
 
