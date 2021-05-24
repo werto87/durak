@@ -5,9 +5,8 @@
 #include <pipes/push_back.hpp>
 #include <pipes/transform.hpp>
 #include <random>
-#include <range/v3/range.hpp>
-#include <range/v3/range/conversion.hpp>
-#include <range/v3/range_fwd.hpp>
+#include <range/v3/all.hpp>
+
 namespace durak
 {
 bool
@@ -54,8 +53,8 @@ std::vector<Card>
 sortedCardIndexing (std::vector<Card> cards, std::vector<size_t> const &indexes)
 {
   auto result = std::vector<Card>{};
-  std::ranges::sort (cards);
-  pipes::mux (ranges::to_vector (std::views::iota (size_t{ 1 }, cards.size () + 1)), cards) >>= pipes::filter ([&indexes] (size_t i, Card) { return indexes.end () != std::ranges::find (indexes, i); }) >>= pipes::transform ([] (size_t, Card const &card) { return card; }) >>= pipes::push_back (result);
+  ranges::sort (cards);
+  pipes::mux (ranges::to_vector (ranges::views::iota (size_t{ 1 }, cards.size () + 1)), cards) >>= pipes::filter ([&indexes] (size_t i, Card) { return indexes.end () != ranges::find (indexes, i); }) >>= pipes::transform ([] (size_t, Card const &card) { return card; }) >>= pipes::push_back (result);
   return result;
 }
 }

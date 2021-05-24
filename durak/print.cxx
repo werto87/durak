@@ -3,8 +3,7 @@
 #include <fmt/format.h>
 #include <magic_enum.hpp>
 #include <pipes/pipes.hpp>
-#include <range/v3/range.hpp>
-#include <ranges>
+#include <range/v3/all.hpp>
 #include <sstream>
 
 namespace durak
@@ -22,7 +21,7 @@ operator<< (std::ostream &os, Player const &player)
 {
   os << "Player Cards sorted by Value" << std::endl;
   auto cards = player.getCards ();
-  std::ranges::sort (cards);
+  ranges::sort (cards);
   for (auto const &card : cards)
     os << card << std::endl;
   return os;
@@ -31,7 +30,7 @@ operator<< (std::ostream &os, Player const &player)
 std::string
 cardsSortedByValueWithIndex (std::vector<Card> cards)
 {
-  std::ranges::sort (cards);
+  ranges::sort (cards);
   auto cardsMessage = std::stringstream{};
   cardsMessage << "Cards sorted by Value with Index, Value and Type " << std::endl;
   for (size_t i = 0; auto const &card : cards)
@@ -98,8 +97,8 @@ tableAsString (Game const &game)
   // maybe we skip beeten cards there is no reason that they have an index
   // maybe we put them at the start and the other cards and with an index at the end
   auto result = std::vector<std::tuple<int, Card, boost::optional<Card>>>{};
-  pipes::mux (ranges::to<std::vector> (std::views::iota (size_t{}, game.getTable ().size ())), game.getTable ()) >>= pipes::transform ([] (auto index, auto &&card) { return std::make_tuple (index, card.first, card.second); }) >>= pipes::push_back (result);
-  std::ranges::sort (result, [] (std::tuple<int, Card, boost::optional<Card>> const &x, std::tuple<int, Card, boost::optional<Card>> const &y) { return std::get<1> (x) < std::get<1> (y); });
+  pipes::mux (ranges::to<std::vector> (ranges::views::iota (size_t{}, game.getTable ().size ())), game.getTable ()) >>= pipes::transform ([] (auto index, auto &&card) { return std::make_tuple (index, card.first, card.second); }) >>= pipes::push_back (result);
+  ranges::sort (result, [] (std::tuple<int, Card, boost::optional<Card>> const &x, std::tuple<int, Card, boost::optional<Card>> const &y) { return std::get<1> (x) < std::get<1> (y); });
   auto cardsMessage = std::stringstream{};
   cardsMessage << "Cards On Table sorted by Value with Index, Value and Type " << std::endl;
   for (auto const &card : result)

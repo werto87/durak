@@ -3,13 +3,12 @@
 #include "durak/gameData.hxx"
 #include "durak/player.hxx"
 #include <algorithm>
-#include <bits/ranges_algo.h>
 #include <cstddef>
 #include <iostream>
 #include <iterator>
 #include <pipes/pipes.hpp>
 #include <random>
-#include <range/v3/range.hpp>
+#include <range/v3/all.hpp>
 #include <stdexcept>
 namespace durak
 {
@@ -76,13 +75,13 @@ Game::playerAssists (PlayerRole player, std::vector<Card> const &cards)
       // TODO maybe we can do something here to make it more readable
       auto tableVector = getTableAsVector ();
       auto sortByValue = [] (auto const &x, auto const &y) { return x.value > y.value; };
-      std::ranges::sort (tableVector, sortByValue);
+      ranges::sort (tableVector, sortByValue);
       auto equal = [] (auto const &x, auto const &y) { return x.value == y.value; };
       tableVector.erase (std::unique (tableVector.begin (), tableVector.end (), equal), tableVector.end ());
       auto isAllowedToPutCards = true;
       for (auto const &card : cards)
         {
-          if (not std::ranges::binary_search (tableVector, card, sortByValue))
+          if (not ranges::binary_search (tableVector, card, sortByValue))
             {
               isAllowedToPutCards = false;
               break;
@@ -102,7 +101,7 @@ Game::playerDefends (Card const &cardToBeat, Card const &card)
 {
   if (auto defendingPlayer = getDefendingPlayer ())
     {
-      if (auto cardToBeatItr = std::ranges::find_if (table, [&cardToBeat] (auto const &cardAndOptionalCard) { return cardAndOptionalCard.first == cardToBeat; }); cardToBeatItr != table.end () && not cardToBeatItr->second && beats (cardToBeatItr->first, card, trump))
+      if (auto cardToBeatItr = ranges::find_if (table, [&cardToBeat] (auto const &cardAndOptionalCard) { return cardAndOptionalCard.first == cardToBeat; }); cardToBeatItr != table.end () && not cardToBeatItr->second && beats (cardToBeatItr->first, card, trump))
         {
           if (defendingPlayer.value ().dropCard (card))
             {
@@ -182,7 +181,7 @@ std::vector<std::pair<size_t, Card>>
 Game::cardsNotBeatenOnTableWithIndex () const
 {
   auto results = std::vector<std::pair<size_t, Card>>{};
-  pipes::mux (ranges::to<std::vector> (std::views::iota (size_t{}, getTable ().size ())), getTable ()) >>= pipes::filter ([] (int, std::pair<Card, boost::optional<Card>> b) { return not b.second.has_value (); }) >>= pipes::transform ([] (int a, std::pair<Card, boost::optional<Card>> b) { return std::make_pair (a, b.first); }) >>= pipes::push_back (results);
+  pipes::mux (ranges::to<std::vector> (ranges::views::iota (size_t{}, getTable ().size ())), getTable ()) >>= pipes::filter ([] (int, std::pair<Card, boost::optional<Card>> b) { return not b.second.has_value (); }) >>= pipes::transform ([] (int a, std::pair<Card, boost::optional<Card>> b) { return std::make_pair (a, b.first); }) >>= pipes::push_back (results);
   return results;
 }
 
@@ -358,14 +357,14 @@ Game::getAttackStarted () const
 bool
 Game::checkIfGameIsOver () const
 {
-  return players.size () <= 1 || (cardDeck.empty () && std::ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ());
+  return players.size () <= 1 || (cardDeck.empty () && ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ());
 }
 
 boost::optional<Player>
 Game::durak () const
 {
   if (not checkIfGameIsOver ()) throw std::logic_error{ "calling durak and game is not over checkIfGameIsOver () == false" };
-  if (cardDeck.empty () && std::ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ())
+  if (cardDeck.empty () && ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ())
     {
       return {};
     }
@@ -432,7 +431,8 @@ Game::getGameData () const
   auto assistingPlayer = getAssistingPlayer ();
   auto attackingPlayer = getAttackingPlayer ();
   auto defendingPlayer = getDefendingPlayer ();
-  std::ranges::transform (players, std::back_inserter (result.players), [&] (Player const &player) {
+
+  std::transform (players.begin (), players.end (), std::back_inserter (result.players), [&] (Player const &player) {
     auto playerRole = PlayerRole::waiting;
     if (assistingPlayer && player.id == assistingPlayer.value ().id)
       {
@@ -449,7 +449,7 @@ Game::getGameData () const
     auto playerData = PlayerData{};
     playerData.name = player.id;
     // playerData.cards = player.getCards ();
-    std::ranges::transform (player.getCards (), std::back_inserter (playerData.cards), [] (durak::Card const &card) { return card; });
+    std::transform (player.getCards ().begin (), player.getCards ().end (), std::back_inserter (playerData.cards), [] (durak::Card const &card) { return card; });
     playerData.playerRole = playerRole;
     return playerData;
   });

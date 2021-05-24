@@ -1,6 +1,6 @@
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -fcoroutines")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g -fuse-ld=lld -fcoroutines")
-#set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fcoroutines -v")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fcoroutines -v")
 cmake_minimum_required(VERSION 3.17)
 project(project VERSION 1.0.0
   DESCRIPTION project
@@ -12,6 +12,8 @@ cmake_policy(SET CMP0015 NEW)
 ########## enable cache system
 include(cmake/Cache.cmake)
 
+
+set(BUILD_WASM FALSE)
 ########## link against the libs to apply the configurations to the target
 # compiler warnings
 set(PROJECT_WARNINGS project_warning)
@@ -35,6 +37,9 @@ target_compile_features(${PROJECT_OPTIONS} INTERFACE cxx_std_20)
 #include(cmake/StaticAnalyzers.cmake) 
  
 ######## conan setup
+IF(BUILD_WASM)
+SET(CONAN_DISABLE_CHECK_COMPILER ON)
+ENDIF(BUILD_WASM)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
@@ -47,22 +52,48 @@ add_subdirectory(durak)
 
 
 ####### link
-target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(${TARGET_NAME} PRIVATE
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+
+if(BUILD_WASM)
+  target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  target_include_directories(${TARGET_NAME} PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    /home/walde/some_boost_test/modular-boost
+    /home/walde/projects/confu_boost/
   )
+else()
+  target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+  target_include_directories(${TARGET_NAME} PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+  )
+endif()
   
 
-target_link_libraries(${TARGET_NAME} PRIVATE
-${PROJECT_WARNINGS}
-${PROJECT_OPTIONS}
-CONAN_PKG::range-v3
-CONAN_PKG::pipes
-CONAN_PKG::magic_enum
-CONAN_PKG::fmt
-CONAN_PKG::confu_boost
-)
+
+if(BUILD_WASM)
+  target_link_libraries(${TARGET_NAME} PRIVATE
+    ${PROJECT_WARNINGS}
+    ${PROJECT_OPTIONS}
+    CONAN_PKG::range-v3
+    CONAN_PKG::pipes
+    CONAN_PKG::magic_enum
+    CONAN_PKG::fmt
+    libconfuBoost.a
+  )
+else()
+  target_link_libraries(${TARGET_NAME} PRIVATE
+    ${PROJECT_WARNINGS}
+    ${PROJECT_OPTIONS}
+    CONAN_PKG::range-v3
+    CONAN_PKG::pipes
+    CONAN_PKG::magic_enum
+    CONAN_PKG::fmt
+    CONAN_PKG::confu_boost
+  )
+endif()
+
+
 
 ####### create executable
 OPTION(BUILD_TESTS "enable tests" OFF)
@@ -71,7 +102,9 @@ IF(BUILD_TESTS)
     add_subdirectory(test) 
 ENDIF(BUILD_TESTS)
 
-
+target_link_directories(${TARGET_NAME} PRIVATE
+/home/walde/wasm_libs/
+)
  
 if (CMAKE_BINARY_DIR)
 target_compile_definitions(${TARGET_NAME} PRIVATE PATH_TO_BINARY="${CMAKE_BINARY_DIR}")

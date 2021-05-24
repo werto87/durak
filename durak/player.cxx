@@ -1,7 +1,7 @@
 #include "durak/player.hxx"
 #include <pipes/dev_null.hpp>
 #include <pipes/pipes.hpp>
-#include <range/v3/range.hpp>
+#include <range/v3/all.hpp>
 #include <stdexcept>
 #include <string>
 namespace durak
@@ -32,7 +32,7 @@ Player::cardsForIndex (std::vector<size_t> const &cardIndex) const
 {
   if (cardIndex.size () > cards.size ()) throw std::logic_error ("cardIndex.size() > cards.size ()" + std::to_string (cardIndex.size ()) + " != " + std::to_string (cards.size ()));
   auto result = std::vector<Card>{};
-  pipes::mux (ranges::to<std::vector> (std::views::iota (size_t{}, cards.size ())), cards) >>= pipes::filter ([&cardIndex] (int i, auto) { return std::find (cardIndex.begin (), cardIndex.end (), i) != cardIndex.end (); }) >>= pipes::transform ([] (auto, auto &&card) { return card; }) >>= pipes::push_back (result);
+  pipes::mux (ranges::to<std::vector> (ranges::views::iota (size_t{}, cards.size ())), cards) >>= pipes::filter ([&cardIndex] (int i, auto) { return std::find (cardIndex.begin (), cardIndex.end (), i) != cardIndex.end (); }) >>= pipes::transform ([] (auto, auto &&card) { return card; }) >>= pipes::push_back (result);
   if (cardIndex.size () != result.size ()) throw std::logic_error ("cardIndex.size() != result.size()" + std::to_string (cardIndex.size ()) + " != " + std::to_string (result.size ()));
   return result;
 }
@@ -40,7 +40,7 @@ Player::cardsForIndex (std::vector<size_t> const &cardIndex) const
 bool
 Player::dropCard (Card const &card)
 {
-  auto cardItr = std::ranges::find (cards, card);
+  auto cardItr = ranges::find (cards, card);
   if (cardItr != cards.end ())
     {
       cards.erase (cardItr);

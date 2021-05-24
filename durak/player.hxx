@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <boost/optional.hpp>
 #include <cstddef>
+#include <string>
 #include <sys/types.h>
 #include <vector>
 namespace durak
