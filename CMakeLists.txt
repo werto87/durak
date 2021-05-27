@@ -1,6 +1,6 @@
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -g -fuse-ld=lld -fcoroutines")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fcoroutines -v")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=c++20 -s WASM=1")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}    -fcoroutines-ts -std=c++20 -s WASM=1" )
 cmake_minimum_required(VERSION 3.17)
 project(project VERSION 1.0.0
   DESCRIPTION project
