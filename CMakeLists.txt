@@ -13,7 +13,7 @@ cmake_policy(SET CMP0015 NEW)
 include(cmake/Cache.cmake)
 
 
-set(BUILD_WASM TRUE)
+set(BUILD_WASM FALSE)
 ########## link against the libs to apply the configurations to the target
 # compiler warnings
 set(PROJECT_WARNINGS project_warning)
@@ -38,8 +38,8 @@ target_compile_features(${PROJECT_OPTIONS} INTERFACE cxx_std_20)
  
 ######## conan setup
 IF(BUILD_WASM)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --ranlib=emranlib -s WASM=1 -s USE_PTHREADS")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --ranlib=emranlib -s WASM=1 -s USE_PTHREADS")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -s WASM=1 -s USE_PTHREADS")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM=1 -s USE_PTHREADS")
 SET(CONAN_DISABLE_CHECK_COMPILER ON)
 ENDIF(BUILD_WASM)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
@@ -47,7 +47,7 @@ conan_basic_setup(TARGETS)
 
 
 set(TARGET_NAME durak)
-add_library(${TARGET_NAME})
+add_library(${TARGET_NAME} INTERFACE)
 
 ######## add sub dir
 add_subdirectory(durak) 
@@ -56,8 +56,8 @@ add_subdirectory(durak)
 ####### link
 
 
-target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-target_include_directories(${TARGET_NAME} PRIVATE
+target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(${TARGET_NAME} INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
@@ -66,7 +66,7 @@ target_include_directories(${TARGET_NAME} PRIVATE
 
 
 
-target_link_libraries(${TARGET_NAME} PRIVATE
+target_link_libraries(${TARGET_NAME} INTERFACE
     ${PROJECT_WARNINGS}
     ${PROJECT_OPTIONS}
     CONAN_PKG::range-v3
@@ -80,19 +80,15 @@ target_link_libraries(${TARGET_NAME} PRIVATE
 
 
 ####### create executable
-OPTION(BUILD_TESTS "enable tests" OFF)
-IF(BUILD_TESTS)
+OPTION(BUILD_TESTS "enable tests" ON)
+IF(NOT BUILD_WASM AND BUILD_TESTS)
     enable_testing()
     add_subdirectory(test) 
-ENDIF(BUILD_TESTS)
+ENDIF(NOT BUILD_WASM AND BUILD_TESTS)
 
-target_link_directories(${TARGET_NAME} PRIVATE
-/home/walde/wasm_libs/
-)
+
  
-if (CMAKE_BINARY_DIR)
-target_compile_definitions(${TARGET_NAME} PRIVATE PATH_TO_BINARY="${CMAKE_BINARY_DIR}")
-endif()
+
 
 ####### include what you use
 #find_program(iwyu_path NAMES include-what-you-use iwyu)
