@@ -13,7 +13,7 @@ cmake_policy(SET CMP0015 NEW)
 include(cmake/Cache.cmake)
 
 
-set(BUILD_WASM FALSE)
+set(BUILD_WASM TRUE)
 ########## link against the libs to apply the configurations to the target
 # compiler warnings
 set(PROJECT_WARNINGS project_warning)
@@ -38,6 +38,8 @@ target_compile_features(${PROJECT_OPTIONS} INTERFACE cxx_std_20)
  
 ######## conan setup
 IF(BUILD_WASM)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM=1 -s USE_PTHREADS")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM=1 -s USE_PTHREADS")
 SET(CONAN_DISABLE_CHECK_COMPILER ON)
 ENDIF(BUILD_WASM)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
