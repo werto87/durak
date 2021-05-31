@@ -1,12 +1,22 @@
 #ifndef DA13E483_1BFA_4A04_AC49_795808169C60
 #define DA13E483_1BFA_4A04_AC49_795808169C60
 
-#include "confu_boost/confuBoost.hxx"
 #include "durak/card.hxx"
 #include <boost/fusion/adapted/boost_tuple.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
+#include <boost/fusion/adapted/struct/adapt_struct.hpp>
+#include <boost/fusion/adapted/struct/define_struct.hpp>
+#include <boost/fusion/algorithm/query/count.hpp>
+#include <boost/fusion/functional.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/algorithm.hpp>
+#include <boost/fusion/include/at.hpp>
 #include <boost/fusion/include/boost_tuple.hpp>
+#include <boost/fusion/include/count.hpp>
+#include <boost/fusion/include/define_struct.hpp>
 #include <boost/fusion/include/std_pair.hpp>
+#include <boost/fusion/sequence/intrinsic/at.hpp>
+#include <boost/fusion/sequence/intrinsic_fwd.hpp>
 #include <boost/optional.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <optional>
@@ -43,11 +53,5 @@ struct GameData
 }
 
 BOOST_FUSION_ADAPT_STRUCT (durak::GameData, trump, table, players, round)
-
-BOOST_SERIALIZATION_BOILER_PLATE (durak::Type)
-BOOST_SERIALIZATION_BOILER_PLATE (durak::PlayerRole)
-BOOST_SERIALIZATION_BOILER_PLATE (durak::Card)
-BOOST_SERIALIZATION_BOILER_PLATE (durak::PlayerData)
-BOOST_SERIALIZATION_BOILER_PLATE (durak::GameData)
 
 #endif /* DA13E483_1BFA_4A04_AC49_795808169C60 */

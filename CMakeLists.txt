@@ -1,6 +1,6 @@
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=c++20 -s WASM=1")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}    -fcoroutines-ts -std=c++20 -s WASM=1" )
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}   -std=c++20 ")
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++20 " )
 cmake_minimum_required(VERSION 3.17)
 project(project VERSION 1.0.0
   DESCRIPTION project
@@ -79,7 +79,7 @@ if(BUILD_WASM)
     CONAN_PKG::pipes
     CONAN_PKG::magic_enum
     CONAN_PKG::fmt
-    libconfuBoost.a
+    CONAN_PKG::boost
   )
 else()
   target_link_libraries(${TARGET_NAME} PRIVATE
@@ -89,7 +89,7 @@ else()
     CONAN_PKG::pipes
     CONAN_PKG::magic_enum
     CONAN_PKG::fmt
-    CONAN_PKG::confu_boost
+    CONAN_PKG::boost
   )
 endif()
 
