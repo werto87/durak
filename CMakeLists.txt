@@ -38,7 +38,7 @@ target_compile_features(${PROJECT_OPTIONS} INTERFACE cxx_std_20)
  
 ######## conan setup
 IF(BUILD_WASM)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM=1 -s USE_PTHREADS")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1 -s USE_PTHREADS")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM=1 -s USE_PTHREADS")
 SET(CONAN_DISABLE_CHECK_COMPILER ON)
 ENDIF(BUILD_WASM)
@@ -55,26 +55,18 @@ add_subdirectory(durak)
 
 ####### link
 
-if(BUILD_WASM)
-  target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-  target_include_directories(${TARGET_NAME} PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    /home/walde/some_boost_test/modular-boost
-    /home/walde/projects/confu_boost/
-  )
-else()
-  target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
-  target_include_directories(${TARGET_NAME} PRIVATE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-  )
-endif()
+
+target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(${TARGET_NAME} PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+
   
 
 
-if(BUILD_WASM)
-  target_link_libraries(${TARGET_NAME} PRIVATE
+
+target_link_libraries(${TARGET_NAME} PRIVATE
     ${PROJECT_WARNINGS}
     ${PROJECT_OPTIONS}
     CONAN_PKG::range-v3
@@ -83,17 +75,7 @@ if(BUILD_WASM)
     CONAN_PKG::fmt
     CONAN_PKG::boost
   )
-else()
-  target_link_libraries(${TARGET_NAME} PRIVATE
-    ${PROJECT_WARNINGS}
-    ${PROJECT_OPTIONS}
-    CONAN_PKG::range-v3
-    CONAN_PKG::pipes
-    CONAN_PKG::magic_enum
-    CONAN_PKG::fmt
-    CONAN_PKG::boost
-  )
-endif()
+
 
 
 
