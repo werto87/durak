@@ -2,7 +2,9 @@
 #define B3662CAA_D812_46F7_8DD7_C85FCFAC47A4
 
 #include "durak/card.hxx"
+#include "durak/constant.hxx"
 #include "durak/gameData.hxx"
+#include "durak/gameOption.hxx"
 #include "durak/player.hxx"
 #include <algorithm>
 #include <boost/assign.hpp>
@@ -21,13 +23,12 @@ namespace durak
 {
 
 inline std::vector<Card>
-generateCardDeck ()
+generateCardDeck (u_int16_t maxValue = defaultMaxCardValue, u_int16_t typeCount = defaultTypeCount)
 {
-  const size_t cardValueMax = 9;
   std::vector<Card> cardDeck{};
-  for (u_int16_t type = 0; type <= 3; type++)
+  for (u_int16_t type = 1; type <= typeCount; type++)
     {
-      for (u_int16_t cardValue = 1; cardValue <= cardValueMax; cardValue++)
+      for (u_int16_t cardValue = 1; cardValue <= maxValue; cardValue++)
         {
           cardDeck.push_back (Card{ .value = cardValue, .type = static_cast<Type> (type) });
         }
@@ -70,6 +71,26 @@ public:
   Game () = default;
   explicit Game (std::vector<std::string> &&playerNames) : cardDeck{ generateCardDeck () }
   {
+    trump = cardDeck.front ().type;
+    // TODO use move itterator
+    std::transform (playerNames.begin (), playerNames.end (), std::back_inserter (players), [] (auto playername) {
+      auto player = Player{};
+      player.id.swap (playername);
+      return player;
+    });
+    std::for_each (players.begin (), players.end (), [this] (Player &player) { playerDrawsCardsFromDeck (player, numberOfCardsPlayerShouldHave); });
+  }
+
+  Game (std::vector<std::string> &&playerNames, GameOption gameOption) : round (gameOption.roundToStart), numberOfCardsPlayerShouldHave{ gameOption.numberOfCardsPlayerShouldHave }
+  {
+    if (gameOption.customCardDeck)
+      {
+        cardDeck = gameOption.customCardDeck.value ();
+      }
+    else
+      {
+        cardDeck = generateCardDeck (gameOption.maxCardValue, gameOption.typeCount);
+      }
     trump = cardDeck.front ().type;
     // TODO use move itterator
     std::transform (playerNames.begin (), playerNames.end (), std::back_inserter (players), [] (auto playername) {
@@ -510,8 +531,8 @@ private:
   Type trump{};
   bool attackStarted = false;
   bool gameOver = false;
-  size_t round{ 1 };
-  size_t numberOfCardsPlayerShouldHave{ 6 };
+  size_t round{ defaultRoundToStart };
+  size_t numberOfCardsPlayerShouldHave{ defaultNumberOfCardsPlayerShouldHave };
 };
 
 }

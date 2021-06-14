@@ -4,4 +4,6 @@ target_sources(${TARGET_NAME} PRIVATE
  player.hxx
  print.hxx
  gameData.hxx
+ constant.hxx
+ gameOption.hxx
  )
