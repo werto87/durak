@@ -32,6 +32,20 @@ TEST_CASE ("game option", "[game]")
   REQUIRE (player1.getCards ().at (0) == Card{ 6, Type::hearts });
   REQUIRE (player2.getCards ().size () == 6);
 }
+
+TEST_CASE ("game option player card 7", "[game]")
+{
+  auto gameOption = GameOption{};
+  gameOption.customCardDeck = testCardDeck ();
+  gameOption.numberOfCardsPlayerShouldHave = 7;
+  auto game = Game{ { "player1", "player2" }, gameOption };
+  auto &player1 = game.getPlayers ().at (0);
+  auto &player2 = game.getPlayers ().at (1);
+  REQUIRE (player1.getCards ().size () == 7);
+  REQUIRE (player1.getCards ().at (0) == Card{ 6, Type::hearts });
+  REQUIRE (player2.getCards ().size () == 7);
+}
+
 /*
 TEST_CASE ("player starts attack", "[game]")
 {
