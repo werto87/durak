@@ -1,6 +1,7 @@
 #include "durak/game.hxx"
 #include "durak/card.hxx"
 #include "durak/gameData.hxx"
+#include "durak/gameOption.hxx"
 #include "durak/print.hxx"
 #include "test/constant.hxx"
 #include <algorithm>
@@ -17,19 +18,21 @@
 #include <utility>
 #include <vector>
 
-/*
 namespace durak::test
 {
 
-TEST_CASE ("at the start of the game the players have 6 cards", "[game]")
+TEST_CASE ("game option", "[game]")
 {
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
+  auto gameOption = GameOption{};
+  gameOption.customCardDeck = testCardDeck ();
+  auto game = Game{ { "player1", "player2" }, gameOption };
   auto &player1 = game.getPlayers ().at (0);
   auto &player2 = game.getPlayers ().at (1);
   REQUIRE (player1.getCards ().size () == 6);
+  REQUIRE (player1.getCards ().at (0) == Card{ 6, Type::hearts });
   REQUIRE (player2.getCards ().size () == 6);
 }
-
+/*
 TEST_CASE ("player starts attack", "[game]")
 {
   auto game = Game{ { "player1", "player2" }, testCardDeck () };
@@ -160,6 +163,5 @@ TEST_CASE ("playground", "[game]")
   auto gameData = GameData{};
   std::cout << confu_boost::toString (gameData) << std::endl;
 }
-
-}
 */
+}
