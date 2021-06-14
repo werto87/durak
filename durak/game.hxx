@@ -524,6 +524,16 @@ public:
     return trump;
   }
 
+  void
+  removePlayer (std::string const &accountName)
+  {
+    if (auto playerItr = std::find_if (players.begin (), players.end (), [&accountName] (Player const &_player) { return _player.id == accountName; }); playerItr != players.end ())
+      {
+        gameOver = true;
+        std::iter_swap (playerItr, players.begin ());
+      }
+  }
+
 private:
   std::vector<Card> cardDeck{};
   std::vector<Player> players{};
