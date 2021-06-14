@@ -26,7 +26,7 @@ inline std::vector<Card>
 generateCardDeck (u_int16_t maxValue = defaultMaxCardValue, u_int16_t typeCount = defaultTypeCount)
 {
   std::vector<Card> cardDeck{};
-  for (u_int16_t type = 1; type <= typeCount; type++)
+  for (u_int16_t type = 0; type < typeCount; type++)
     {
       for (u_int16_t cardValue = 1; cardValue <= maxValue; cardValue++)
         {
