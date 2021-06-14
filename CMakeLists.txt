@@ -35,9 +35,6 @@ target_compile_features(${PROJECT_OPTIONS} INTERFACE cxx_std_20)
 #include(cmake/StaticAnalyzers.cmake) 
  
 ######## conan setup
-IF(BUILD_WASM)
-SET(CONAN_DISABLE_CHECK_COMPILER ON)
-ENDIF(BUILD_WASM)
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup(TARGETS)
 
@@ -77,10 +74,10 @@ target_link_libraries(${TARGET_NAME} INTERFACE
 
 ####### create executable
 OPTION(BUILD_TESTS "enable tests" ON)
-IF(NOT BUILD_WASM AND BUILD_TESTS)
+IF(BUILD_TESTS)
     enable_testing()
     add_subdirectory(test) 
-ENDIF(NOT BUILD_WASM AND BUILD_TESTS)
+ENDIF(BUILD_TESTS)
 
 
  
