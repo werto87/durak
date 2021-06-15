@@ -416,14 +416,17 @@ public:
   void
   calculateNextRoles (bool attackSuccess)
   {
-    if (attackSuccess)
+    if (players.size () > 1)
       {
-        std::rotate (players.begin (), players.begin () + 1, players.end ());
-        std::rotate (players.begin (), players.begin () + 1, players.end ());
-      }
-    else
-      {
-        std::rotate (players.begin (), players.begin () + 1, players.end ());
+        if (attackSuccess)
+          {
+            std::rotate (players.begin (), players.begin () + 1, players.end ());
+            std::rotate (players.begin (), players.begin () + 1, players.end ());
+          }
+        else
+          {
+            std::rotate (players.begin (), players.begin () + 1, players.end ());
+          }
       }
   }
 
