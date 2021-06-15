@@ -331,13 +331,9 @@ public:
       {
         return {};
       }
-    else if (players.size () == 1)
-      {
-        return players.front ();
-      }
     else
       {
-        throw std::logic_error{ "error while calculating loser in  durak::Game::durak ()" };
+        return players.front ();
       }
   }
 
