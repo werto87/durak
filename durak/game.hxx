@@ -344,7 +344,7 @@ public:
   bool
   checkIfGameIsOver () const
   {
-    return players.size () <= 1 || (cardDeck.empty () && ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ());
+    return gameOver || players.size () <= 1 || (cardDeck.empty () && ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ());
   }
 
   void
