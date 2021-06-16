@@ -148,27 +148,30 @@ public:
   playerAssists (PlayerRole playerRole, std::vector<Card> const &cards)
   {
     auto result = false;
-    if (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker)
+    if (cardsAllowedToPlaceOnTable () >= cards.size ())
       {
-        // TODO maybe we can do something here to make it more readable
-        auto tableVector = getTableAsVector ();
-        auto sortByValue = [] (auto const &x, auto const &y) { return x.value > y.value; };
-        ranges::sort (tableVector, sortByValue);
-        auto equal = [] (auto const &x, auto const &y) { return x.value == y.value; };
-        tableVector.erase (std::unique (tableVector.begin (), tableVector.end (), equal), tableVector.end ());
-        auto isAllowedToPutCards = true;
-        for (auto const &card : cards)
+        if (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker)
           {
-            if (not ranges::binary_search (tableVector, card, sortByValue))
+            // TODO maybe we can do something here to make it more readable
+            auto tableVector = getTableAsVector ();
+            auto sortByValue = [] (auto const &x, auto const &y) { return x.value > y.value; };
+            ranges::sort (tableVector, sortByValue);
+            auto equal = [] (auto const &x, auto const &y) { return x.value == y.value; };
+            tableVector.erase (std::unique (tableVector.begin (), tableVector.end (), equal), tableVector.end ());
+            auto isAllowedToPutCards = true;
+            for (auto const &card : cards)
               {
-                isAllowedToPutCards = false;
-                break;
+                if (not ranges::binary_search (tableVector, card, sortByValue))
+                  {
+                    isAllowedToPutCards = false;
+                    break;
+                  }
               }
-          }
-        if (isAllowedToPutCards)
-          {
-            result = true;
-            players.at (static_cast<size_t> (playerRole)).putCards (cards, table);
+            if (isAllowedToPutCards)
+              {
+                result = true;
+                players.at (static_cast<size_t> (playerRole)).putCards (cards, table);
+              }
           }
       }
     return result;
@@ -373,7 +376,7 @@ public:
   getTableAsVector ()
   {
     auto result = std::vector<Card>{};
-    for (auto &cardPair : table)
+    for (auto cardPair : table)
       {
         result.push_back (std::move (cardPair.first));
         if (cardPair.second)
@@ -543,6 +546,5 @@ private:
   size_t round{ defaultRoundToStart };
   size_t numberOfCardsPlayerShouldHave{ defaultNumberOfCardsPlayerShouldHave };
 };
-
 }
 #endif /* B3662CAA_D812_46F7_8DD7_C85FCFAC47A4 */

@@ -46,6 +46,19 @@ TEST_CASE ("game option player card 7", "[game]")
   REQUIRE (player2.getCards ().size () == 7);
 }
 
+TEST_CASE ("its not allowed to play more cards than the defending player has", "[game]")
+{
+  auto gameOption = GameOption{};
+  gameOption.customCardDeck = testCardDeck8 ();
+  auto game = Game{ { "player1", "player2" }, gameOption };
+  auto &attackPlayer = game.getAttackingPlayer ().value ();
+  auto &defendPlayer = game.getDefendingPlayer ().value ();
+  REQUIRE (defendPlayer.getCards ().size () == 2);
+  game.playerStartsAttack (attackPlayer.cardsForIndex ({ 5 }));
+  game.playerAssists (PlayerRole::attack, attackPlayer.cardsForIndex ({ 2, 3, 4 }));
+  REQUIRE (game.getTable ().size () <= defendPlayer.getCards ().size ());
+}
+
 /*
 TEST_CASE ("player starts attack", "[game]")
 {
