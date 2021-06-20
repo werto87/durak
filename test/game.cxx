@@ -105,15 +105,15 @@ TEST_CASE ("allowed moves assisting player", "[game]")
   auto &defendPlayer = game.getDefendingPlayer ().value ();
   auto &assistingPlayer = game.getAssistingPlayer ().value ();
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).empty ());
-  game.playerStartsAttack (attackPlayer.cardsForIndex ({ 0 }));
+  REQUIRE (game.playerStartsAttack (attackPlayer.cardsForIndex ({ 0 })));
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 1);
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).front () == AllowedMove::addCard);
-  game.playerAssists (PlayerRole::assistAttacker, assistingPlayer.cardsForIndex ({ 2 }));
+  REQUIRE (game.playerAssists (PlayerRole::assistAttacker, assistingPlayer.cardsForIndex ({ 2 })));
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).empty ());
-  game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0));
+  REQUIRE (game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0)));
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 1);
-  game.playerDefends (game.getTable ().at (1).first, defendPlayer.getCards ().at (0));
-
+  REQUIRE (game.playerDefends (game.getTable ().at (1).first, defendPlayer.getCards ().at (0)));
+  REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 2);
 }
 
 }
