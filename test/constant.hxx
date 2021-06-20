@@ -15,6 +15,12 @@ testCardDeck8 ()
 {
   return std::vector<Card>{ { 8, Type::hearts }, { 9, Type::hearts }, { 4, Type::hearts }, { 4, Type::diamonds }, { 4, Type::spades }, { 4, Type::clubs }, { 5, Type::clubs }, { 6, Type::hearts } };
 }
+
+inline std::vector<Card>
+testCardDeck16 ()
+{
+  return std::vector<Card>{ { 3, Type::hearts }, { 6, Type::diamonds }, { 7, Type::clubs }, { 8, Type::clubs }, { 3, Type::clubs }, { 2, Type::diamonds }, { 3, Type::diamonds }, { 2, Type::clubs }, { 8, Type::hearts }, { 9, Type::hearts }, { 4, Type::hearts }, { 4, Type::diamonds }, { 4, Type::spades }, { 4, Type::clubs }, { 5, Type::clubs }, { 6, Type::hearts } };
+}
 }
 
 #endif /* FE334B5B_FA67_454D_A6F5_A1CBF7D02BB7 */

@@ -12,7 +12,9 @@
 #include <iostream>
 #include <iterator>
 #include <pipes/pipes.hpp>
+#include <range/v3/algorithm/find_if.hpp>
 #include <range/v3/range.hpp>
+#include <stdexcept>
 #include <sys/types.h>
 #include <tuple>
 #include <utility>
@@ -59,136 +61,59 @@ TEST_CASE ("its not allowed to play more cards than the defending player has", "
   REQUIRE (game.getTable ().size () <= defendPlayer.getCards ().size ());
 }
 
-/*
-TEST_CASE ("player starts attack", "[game]")
+TEST_CASE ("allowed moves attacking player", "[game]")
 {
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  REQUIRE (game.getPlayers ().at (static_cast<size_t> (PlayerRole::attack)).getCards ().size () == 6);
-
-  REQUIRE (game.playerStartsAttack ({ { 4, Type::diamonds }, { 4, Type::spades }, { 4, Type::clubs } }));
-  REQUIRE (game.getPlayers ().at (static_cast<size_t> (PlayerRole::attack)).getCards ().size () == 3);
+  auto gameOption = GameOption{};
+  gameOption.customCardDeck = testCardDeck8 ();
+  auto game = Game{ { "player1", "player2" }, gameOption };
+  auto &attackPlayer = game.getAttackingPlayer ().value ();
+  auto &defendPlayer = game.getDefendingPlayer ().value ();
+  REQUIRE (game.getAllowedMoves (PlayerRole::attack).front () == AllowedMove::startAttack);
+  game.playerStartsAttack (attackPlayer.cardsForIndex ({ 5 }));
+  REQUIRE (game.getAllowedMoves (PlayerRole::attack).front () == AllowedMove::addCard);
+  game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0));
+  REQUIRE (game.getAllowedMoves (PlayerRole::attack).size () == 2);
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::attack).begin (), game.getAllowedMoves (PlayerRole::attack).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::addCard; }) != game.getAllowedMoves (PlayerRole::attack).end ());
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::attack).begin (), game.getAllowedMoves (PlayerRole::attack).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::pass; }) != game.getAllowedMoves (PlayerRole::attack).end ());
 }
 
-TEST_CASE ("player assists attack", "[game]")
+TEST_CASE ("allowed moves defending player", "[game]")
 {
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  auto cards = game.getPlayers ().at (static_cast<size_t> (PlayerRole::attack)).getCards ();
-  REQUIRE (cards.size () == 6);
-  game.playerStartsAttack ({ { 4, Type::spades }, { 4, Type::clubs } });
-  cards = game.getPlayers ().at (static_cast<size_t> (PlayerRole::attack)).getCards ();
-  REQUIRE (cards.size () == 4);
-  REQUIRE (game.playerAssists (PlayerRole::attack, { { 4, Type::diamonds }, { 4, Type::hearts } }));
-  cards = game.getPlayers ().at (static_cast<size_t> (PlayerRole::attack)).getCards ();
-  REQUIRE (cards.size () == 2);
-  REQUIRE (game.getTable ().size () == 4);
+  auto gameOption = GameOption{};
+  gameOption.customCardDeck = testCardDeck8 ();
+  auto game = Game{ { "player1", "player2" }, gameOption };
+  auto &attackPlayer = game.getAttackingPlayer ().value ();
+  auto &defendPlayer = game.getDefendingPlayer ().value ();
+  REQUIRE (game.getAllowedMoves (PlayerRole::defend).empty ());
+  game.playerStartsAttack (attackPlayer.cardsForIndex ({ 5 }));
+  REQUIRE (game.getAllowedMoves (PlayerRole::defend).size () == 2);
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::defend; }) != game.getAllowedMoves (PlayerRole::defend).end ());
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::takeCards; }) != game.getAllowedMoves (PlayerRole::defend).end ());
+  game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0));
+  REQUIRE (game.getAllowedMoves (PlayerRole::defend).size () == 1);
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::takeCards; }) != game.getAllowedMoves (PlayerRole::defend).end ());
 }
 
-TEST_CASE ("cardsNotBeatenOnTable empty table", "[game]")
+TEST_CASE ("allowed moves assisting player", "[game]")
 {
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
+  auto gameOption = GameOption{};
+  gameOption.customCardDeck = testCardDeck16 ();
+  auto game = Game{ { "player1", "player2", "player3" }, gameOption };
+  auto optionalGame=std::optional<Game>{};
+  optionalGame=game;
+  auto &attackPlayer = game.getAttackingPlayer ().value ();
+  auto &defendPlayer = game.getDefendingPlayer ().value ();
+  auto &assistingPlayer = game.getAssistingPlayer ().value ();
+  REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).empty ());
+  game.playerStartsAttack (attackPlayer.cardsForIndex ({ 0 }));
+  REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 1);
+  REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).front () == AllowedMove::addCard);
+  game.playerAssists (PlayerRole::assistAttacker, assistingPlayer.cardsForIndex ({ 2 }));
+  REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).empty ());
+  game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0));
+  REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 1);
+  game.playerDefends (game.getTable ().at (1).first, defendPlayer.getCards ().at (0));
+
 }
 
-TEST_CASE ("countOfNotBeatenCardsOnTable table with two cards which are not beaten", "[game]")
-{
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  game.playerStartsAttack ({ { 4, Type::spades }, { 4, Type::clubs } });
-  REQUIRE (game.countOfNotBeatenCardsOnTable () == 2);
-}
-
-TEST_CASE ("cardsNotBeatenOnTableWithIndex table with two cards which are not beaten", "[game]")
-{
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  game.playerStartsAttack ({ { 4, Type::spades }, { 4, Type::clubs } });
-  REQUIRE (game.cardsNotBeatenOnTableWithIndex ().size () == 2);
-  auto [cardIndex, card] = game.cardsNotBeatenOnTableWithIndex ().at (0);
-  REQUIRE (cardIndex == 0);
-  REQUIRE (card.value == 4);
-  REQUIRE (card.type == Type::clubs);
-}
-
-TEST_CASE ("playerDefends player beats one card of two cards on the table", "[game]")
-{
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-
-  game.playerStartsAttack ({ { 4, Type::spades }, { 4, Type::clubs } });
-  REQUIRE (game.playerDefends (game.getTable ().at (0).first, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (3)));
-}
-
-TEST_CASE ("playerDefends value to low", "[game]")
-{
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  game.playerStartsAttack ({ { 4, Type::spades }, { 4, Type::clubs } });
-  REQUIRE_FALSE (game.playerDefends (game.getTable ().at (0).first, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (5)));
-}
-
-TEST_CASE ("playerDefends player beats all cards", "[game]")
-{
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  game.playerStartsAttack ({ { 4, Type::clubs } });
-  REQUIRE (game.countOfNotBeatenCardsOnTable () == 1);
-  REQUIRE (game.playerDefends (game.getTable ().at (0).first, game.getPlayers ().at (static_cast<size_t> (PlayerRole::defend)).getCards ().at (3)));
-  REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
-}
-
-TEST_CASE ("pass player beats all cards attack and def passes table gets cleared ", "[game]")
-{
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  game.playerStartsAttack ({ { 4, Type::clubs } });
-  REQUIRE (game.countOfNotBeatenCardsOnTable () == 1);
-  REQUIRE (game.playerDefends (game.getTable ().at (0).first, game.getDefendingPlayer ().value ().getCards ().at (3)));
-  REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
-  game.pass (PlayerRole::attack);
-  game.pass (PlayerRole::assistAttacker);
-  REQUIRE (game.getTable ().size () == 0);
-  REQUIRE (game.getRound () == 2);
-}
-
-TEST_CASE ("try to play the game", "[game]")
-{
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  game.playerStartsAttack ({ { 4, Type::clubs } });
-  game.countOfNotBeatenCardsOnTable ();
-  game.playerDefends (game.getTable ().at (0).first, game.getDefendingPlayer ().value ().getCards ().at (3));
-  game.countOfNotBeatenCardsOnTable ();
-  game.pass (PlayerRole::attack);
-  game.pass (PlayerRole::assistAttacker);
-  game.getTable ().size ();
-  game.getRound ();
-  while (not game.checkIfGameIsOver ())
-    {
-      game.playerStartsAttack ({ game.getAttackingPlayer ().value ().getCards ().at (0) });
-      game.defendingPlayerTakesAllCardsFromTheTable ();
-      game.pass (PlayerRole::attack);
-      std::cout << game.getRound () << std::endl;
-    }
-  REQUIRE (game.durak ());
-}
-
-TEST_CASE ("getGameData", "[game]")
-{
-  auto game = Game{ { "player1", "player2" }, testCardDeck () };
-  game.playerStartsAttack ({ { 4, Type::clubs } });
-  REQUIRE (game.countOfNotBeatenCardsOnTable () == 1);
-  REQUIRE (game.playerDefends (game.getTable ().at (0).first, game.getDefendingPlayer ().value ().getCards ().at (3)));
-  REQUIRE (game.countOfNotBeatenCardsOnTable () == 0);
-  game.pass (PlayerRole::attack);
-  game.pass (PlayerRole::assistAttacker);
-  REQUIRE (game.getTable ().size () == 0);
-  REQUIRE (game.getRound () == 2);
-  auto gameData = game.getGameData ();
-  REQUIRE (gameData.players.size () == game.getPlayers ().size ());
-  REQUIRE (gameData.table.size () == game.getTable ().size ());
-  REQUIRE (gameData.trump == game.getTrump ());
-}
-
-TEST_CASE ("playground", "[game]")
-{
-
-  auto playerData = PlayerData{};
-  std::cout << confu_boost::toString (playerData) << std::endl;
-  auto gameData = GameData{};
-  std::cout << confu_boost::toString (gameData) << std::endl;
-}
-*/
 }

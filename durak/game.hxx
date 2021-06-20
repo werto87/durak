@@ -15,12 +15,23 @@
 #include <numeric>
 #include <pipes/pipes.hpp>
 #include <random>
+#include <range/v3/algorithm/find_if.hpp>
 #include <range/v3/all.hpp>
+#include <range/v3/view/filter.hpp>
 #include <stdexcept>
 #include <sys/types.h>
 #include <vector>
 namespace durak
 {
+
+enum struct AllowedMove
+{
+  startAttack,
+  addCard,
+  pass,
+  defend,
+  takeCards
+};
 
 inline std::vector<Card>
 generateCardDeck (u_int16_t maxValue = defaultMaxCardValue, u_int16_t typeCount = defaultTypeCount)
@@ -55,7 +66,6 @@ inline boost::optional<Card>
 drawSpecificCard (std::vector<Card> &cardDeck, Card const &cardToDraw)
 {
   auto result = boost::optional<Card>{};
-  // try to find and if found return it and remove it from cardDeck
   auto card = std::find (cardDeck.begin (), cardDeck.end (), cardToDraw);
   if (card != cardDeck.end ())
     {
@@ -534,6 +544,105 @@ public:
         gameOver = true;
         std::iter_swap (playerItr, players.begin ());
       }
+  }
+
+  bool
+  hasCardWhichIsAllowedToAdd (PlayerRole playerRole)
+  {
+    if (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker)
+      {
+        auto cardsOnTable = getTableAsVector ();
+        auto playerCards = std::vector<Card>{};
+        if (PlayerRole::attack == playerRole)
+          {
+            if (auto attackingPlayer = getAttackingPlayer ())
+              {
+                playerCards = attackingPlayer->getCards ();
+              }
+          }
+        else
+          {
+            if (auto assistingPlayer = getAssistingPlayer ())
+              {
+                playerCards = assistingPlayer->getCards ();
+              }
+          }
+        for (auto const &card : getTableAsVector ())
+          {
+            if (ranges::find_if (playerCards, [&card] (Card const &_card) { return card.value == _card.value; }) != playerCards.end ())
+              {
+                return true;
+              }
+          }
+        return false;
+      }
+    else
+      {
+        return false;
+      }
+  }
+
+  bool
+  hasCardWhichIsAllowedDefend (PlayerRole playerRole)
+  {
+    if (playerRole == PlayerRole::defend)
+      {
+        if (auto defendingPlayer = getDefendingPlayer ())
+          {
+            auto playerCards = defendingPlayer->getCards ();
+            for (auto const &cardPair : getTable () | ranges::views::filter ([] (auto const &cardPair) { return !cardPair.second.has_value (); }))
+              {
+                if (ranges::find_if (playerCards, [&card = cardPair.first, &trump = trump] (Card const &_card) { return beats (card, _card, trump); }) != playerCards.end ())
+                  {
+                    return true;
+                  }
+              }
+          }
+        return false;
+      }
+    else
+      {
+        return false;
+      }
+  }
+
+  bool
+  isAllowedToStartAttack (PlayerRole playerRole)
+  {
+    return not attackStarted and playerRole == PlayerRole::attack and table.empty () and getAttackingPlayer () and not getAttackingPlayer ().value ().getCards ().empty () and getDefendingPlayer () and not getDefendingPlayer ().value ().getCards ().empty ();
+  }
+  bool
+  isAllowedToAddCard (PlayerRole playerRole)
+  {
+    return (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker) and attackStarted and hasCardWhichIsAllowedToAdd (playerRole);
+  }
+  bool
+  isAllowedToPass (PlayerRole playerRole)
+  {
+    return attackStarted and (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker) and countOfNotBeatenCardsOnTable () == 0;
+  }
+  bool
+  isAllowedToDefend (PlayerRole playerRole)
+  {
+    return playerRole == PlayerRole::defend and countOfNotBeatenCardsOnTable () > 0 and hasCardWhichIsAllowedDefend (playerRole);
+  }
+  bool
+  isAllowedToTakeCards (PlayerRole playerRole)
+  {
+    return playerRole == PlayerRole::defend and not table.empty ();
+  }
+
+  std::vector<AllowedMove>
+  getAllowedMoves (PlayerRole playerRole)
+  {
+    // TODO if two players attack it make sense to wait (do nothing for a couple of seconds maybe other player adds card)
+    auto allowedMoves = std::vector<AllowedMove>{};
+    if (isAllowedToStartAttack (playerRole)) allowedMoves.push_back (AllowedMove::startAttack);
+    if (isAllowedToAddCard (playerRole)) allowedMoves.push_back (AllowedMove::addCard);
+    if (isAllowedToPass (playerRole)) allowedMoves.push_back (AllowedMove::pass);
+    if (isAllowedToDefend (playerRole)) allowedMoves.push_back (AllowedMove::defend);
+    if (isAllowedToTakeCards (playerRole)) allowedMoves.push_back (AllowedMove::takeCards);
+    return allowedMoves;
   }
 
 private:
