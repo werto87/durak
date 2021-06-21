@@ -641,12 +641,12 @@ public:
   bool
   isAllowedToStartAttack (PlayerRole playerRole)
   {
-    return not attackStarted and playerRole == PlayerRole::attack and table.empty () and getAttackingPlayer () and not getAttackingPlayer ().value ().getCards ().empty () and getDefendingPlayer () and not getDefendingPlayer ().value ().getCards ().empty ();
+    return cardsAllowedToPlaceOnTable () >= 1 && (not attackStarted and playerRole == PlayerRole::attack and table.empty () and getAttackingPlayer () and not getAttackingPlayer ().value ().getCards ().empty () and getDefendingPlayer () and not getDefendingPlayer ().value ().getCards ().empty ());
   }
   bool
   isAllowedToAddCard (PlayerRole playerRole)
   {
-    return (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker) and attackStarted and hasCardWhichIsAllowedToAdd (playerRole);
+    return cardsAllowedToPlaceOnTable () >= 1 && ((playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker) and attackStarted and hasCardWhichIsAllowedToAdd (playerRole));
   }
   bool
   isAllowedToPass (PlayerRole playerRole)
