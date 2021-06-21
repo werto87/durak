@@ -49,9 +49,11 @@ struct GameData
   std::vector<std::pair<Card, boost::optional<Card>>> table{};
   std::vector<PlayerData> players{};
   size_t round{};
+  boost::optional<Card> lastCardInDeck{};
+  size_t cardsInDeck{};
 };
 }
 
-BOOST_FUSION_ADAPT_STRUCT (durak::GameData, trump, table, players, round)
+BOOST_FUSION_ADAPT_STRUCT (durak::GameData, trump, table, players, round, lastCardInDeck, cardsInDeck)
 
 #endif /* DA13E483_1BFA_4A04_AC49_795808169C60 */

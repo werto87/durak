@@ -116,4 +116,6 @@ TEST_CASE ("allowed moves assisting player", "[game]")
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 2);
 }
 
+
+
 }

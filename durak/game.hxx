@@ -24,6 +24,18 @@
 namespace durak
 {
 
+enum struct ResultType
+{
+  cardsGoToGraveyard,
+  cardsGoToPlayer
+};
+struct RoundResult
+{
+  ResultType resultType{};
+  std::vector<Card> cards{};
+  size_t deckSize{};
+};
+
 enum struct AllowedMove
 {
   startAttack,
@@ -75,6 +87,18 @@ drawSpecificCard (std::vector<Card> &cardDeck, Card const &cardToDraw)
   return result;
 }
 
+struct GameState
+{
+  std::vector<Card> cardDeck{};
+  std::vector<Player> players{};
+  std::vector<std::pair<Card, boost::optional<Card>>> table{};
+  Type trump{};
+  bool attackStarted = false;
+  bool gameOver = false;
+  size_t round{ defaultRoundToStart };
+  size_t numberOfCardsPlayerShouldHave{ defaultNumberOfCardsPlayerShouldHave };
+};
+
 class Game
 {
 public:
@@ -122,6 +146,8 @@ public:
     });
     std::for_each (players.begin (), players.end (), [this] (Player &player) { playerDrawsCardsFromDeck (player, numberOfCardsPlayerShouldHave); });
   }
+
+  Game (GameState gameState) : cardDeck{ gameState.cardDeck }, players{ gameState.players }, table{ gameState.table }, trump{ gameState.trump }, attackStarted{ gameState.attackStarted }, gameOver{ gameState.gameOver }, round{ gameState.round }, numberOfCardsPlayerShouldHave{ gameState.numberOfCardsPlayerShouldHave } {}
 
   // attack starts round and can only be used by playr with role attack
   bool
@@ -356,9 +382,12 @@ public:
     return gameOver || players.size () <= 1 || (cardDeck.empty () && ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ());
   }
 
-  void
+  RoundResult
   nextRound (bool attackingSuccess)
   {
+    auto roundResult = RoundResult{};
+    roundResult.cards = getTableAsVector ();
+    roundResult.resultType = attackingSuccess ? ResultType::cardsGoToPlayer : ResultType::cardsGoToGraveyard;
     if (attackingSuccess) defendingPlayerTakesAllCardsFromTheTable ();
     table.clear ();
     round++;
@@ -366,6 +395,8 @@ public:
     drawCards ();
     gameOver = checkIfGameIsOver ();
     calculateNextRoles (attackingSuccess);
+    roundResult.deckSize = cardDeck.size ();
+    return roundResult;
   }
 
   bool
@@ -497,12 +528,13 @@ public:
         }
       auto playerData = PlayerData{};
       playerData.name = player.id;
-      // playerData.cards = player.getCards ();
       std::transform (player.getCards ().begin (), player.getCards ().end (), std::back_inserter (playerData.cards), [] (durak::Card const &card) { return card; });
       playerData.playerRole = playerRole;
       return playerData;
     });
     result.round = getRound ();
+    result.cardsInDeck = cardDeck.size ();
+    if (not cardDeck.empty ()) result.lastCardInDeck = cardDeck.front ();
     return result;
   }
 
