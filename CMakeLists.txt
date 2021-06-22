@@ -66,6 +66,7 @@ target_link_libraries(${TARGET_NAME} INTERFACE
     CONAN_PKG::magic_enum
     CONAN_PKG::fmt
     CONAN_PKG::boost
+    CONAN_PKG::confu_json
   )
 
 

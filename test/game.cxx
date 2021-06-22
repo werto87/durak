@@ -112,6 +112,8 @@ TEST_CASE ("allowed moves assisting player", "[game]")
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 1);
   REQUIRE (game.playerDefends (game.getTable ().at (1).first, defendPlayer.getCards ().at (0)));
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 2);
+  // auto history = game.getHistory ();
+  // ranges::for_each (history, [] (auto const &historyEvent) { std::cout << historyEvent << std::endl; });
 }
 
 }

@@ -160,6 +160,11 @@ public:
           {
             if (cardsHaveSameValue (cards))
               {
+                auto roundInformation = RoundInformation{};
+                roundInformation.playerRoles.push_back ({ PlayerRole::attack, attackingPlayer.value ().id });
+                if (auto defendingPlayer = getDefendingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::defend, defendingPlayer.value ().id });
+                if (auto assistingPlayer = getAssistingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::assistAttacker, assistingPlayer.value ().id });
+                history.push_back (roundInformation);
                 attackingPlayer.value ().putCards (cards, table);
                 attackStarted = true;
                 auto startAttack = StartAttack{};
@@ -697,6 +702,12 @@ public:
     return allowedMoves;
   }
 
+  std::vector<HistoryEvent> const &
+  getHistory () const
+  {
+    return history;
+  }
+
 private:
   std::vector<Card> cardDeck{};
   std::vector<Player> players{};
@@ -706,7 +717,7 @@ private:
   bool gameOver = false;
   size_t round{ defaultRoundToStart };
   size_t numberOfCardsPlayerShouldHave{ defaultNumberOfCardsPlayerShouldHave };
-  std::vector<History> history{};
+  std::vector<HistoryEvent> history{};
 };
 }
 #endif /* B3662CAA_D812_46F7_8DD7_C85FCFAC47A4 */
