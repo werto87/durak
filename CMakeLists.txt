@@ -11,7 +11,6 @@ cmake_policy(SET CMP0015 NEW)
 include(cmake/Cache.cmake)
 
 
-set(BUILD_WASM FALSE)
 ########## link against the libs to apply the configurations to the target
 # compiler warnings
 set(PROJECT_WARNINGS project_warning)

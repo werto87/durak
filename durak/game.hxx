@@ -5,6 +5,7 @@
 #include "durak/constant.hxx"
 #include "durak/gameData.hxx"
 #include "durak/gameOption.hxx"
+#include "durak/move.hxx"
 #include "durak/player.hxx"
 #include <algorithm>
 #include <boost/assign.hpp>
@@ -24,6 +25,15 @@
 namespace durak
 {
 
+enum struct Move
+{
+  startAttack,
+  addCard,
+  pass,
+  defend,
+  takeCards
+};
+
 enum struct ResultType
 {
   cardsGoToGraveyard,
@@ -34,15 +44,6 @@ struct RoundResult
   ResultType resultType{};
   std::vector<Card> cards{};
   size_t deckSize{};
-};
-
-enum struct AllowedMove
-{
-  startAttack,
-  addCard,
-  pass,
-  defend,
-  takeCards
 };
 
 inline std::vector<Card>
@@ -161,6 +162,9 @@ public:
               {
                 attackingPlayer.value ().putCards (cards, table);
                 attackStarted = true;
+                auto startAttack = StartAttack{};
+                startAttack.cards = cards;
+                history.push_back (startAttack);
                 return true;
               }
             else
@@ -206,6 +210,10 @@ public:
             if (isAllowedToPutCards)
               {
                 result = true;
+                auto assistAttack = AssistAttack{};
+                assistAttack.cards = cards;
+                assistAttack.playerRole = playerRole;
+                history.push_back (assistAttack);
                 players.at (static_cast<size_t> (playerRole)).putCards (cards, table);
               }
           }
@@ -225,6 +233,10 @@ public:
               {
                 cardToBeatItr->second = card;
               }
+            auto defend = Defend{};
+            defend.cardToBeat = cardToBeat;
+            defend.card = card;
+            history.push_back (defend);
             return true;
           }
         else
@@ -385,6 +397,14 @@ public:
   RoundResult
   nextRound (bool attackingSuccess)
   {
+    if (attackingSuccess)
+      {
+        history.push_back (DrawCardsFromTable{});
+      }
+    else
+      {
+        history.push_back (Pass{});
+      }
     auto roundResult = RoundResult{};
     roundResult.cards = getTableAsVector ();
     roundResult.resultType = attackingSuccess ? ResultType::cardsGoToPlayer : ResultType::cardsGoToGraveyard;
@@ -664,16 +684,16 @@ public:
     return playerRole == PlayerRole::defend and not table.empty ();
   }
 
-  std::vector<AllowedMove>
+  std::vector<Move>
   getAllowedMoves (PlayerRole playerRole)
   {
     // TODO if two players attack it make sense to wait (do nothing for a couple of seconds maybe other player adds card)
-    auto allowedMoves = std::vector<AllowedMove>{};
-    if (isAllowedToStartAttack (playerRole)) allowedMoves.push_back (AllowedMove::startAttack);
-    if (isAllowedToAddCard (playerRole)) allowedMoves.push_back (AllowedMove::addCard);
-    if (isAllowedToPass (playerRole)) allowedMoves.push_back (AllowedMove::pass);
-    if (isAllowedToDefend (playerRole)) allowedMoves.push_back (AllowedMove::defend);
-    if (isAllowedToTakeCards (playerRole)) allowedMoves.push_back (AllowedMove::takeCards);
+    auto allowedMoves = std::vector<Move>{};
+    if (isAllowedToStartAttack (playerRole)) allowedMoves.push_back (Move::startAttack);
+    if (isAllowedToAddCard (playerRole)) allowedMoves.push_back (Move::addCard);
+    if (isAllowedToPass (playerRole)) allowedMoves.push_back (Move::pass);
+    if (isAllowedToDefend (playerRole)) allowedMoves.push_back (Move::defend);
+    if (isAllowedToTakeCards (playerRole)) allowedMoves.push_back (Move::takeCards);
     return allowedMoves;
   }
 
@@ -686,6 +706,7 @@ private:
   bool gameOver = false;
   size_t round{ defaultRoundToStart };
   size_t numberOfCardsPlayerShouldHave{ defaultNumberOfCardsPlayerShouldHave };
+  std::vector<History> history{};
 };
 }
 #endif /* B3662CAA_D812_46F7_8DD7_C85FCFAC47A4 */

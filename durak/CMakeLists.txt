@@ -6,4 +6,5 @@ target_sources(${TARGET_NAME} PRIVATE
  gameData.hxx
  constant.hxx
  gameOption.hxx
+ move.hxx
  )

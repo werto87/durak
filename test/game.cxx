@@ -68,13 +68,13 @@ TEST_CASE ("allowed moves attacking player", "[game]")
   auto game = Game{ { "player1", "player2" }, gameOption };
   auto &attackPlayer = game.getAttackingPlayer ().value ();
   auto &defendPlayer = game.getDefendingPlayer ().value ();
-  REQUIRE (game.getAllowedMoves (PlayerRole::attack).front () == AllowedMove::startAttack);
+  REQUIRE (game.getAllowedMoves (PlayerRole::attack).front () == Move::startAttack);
   game.playerStartsAttack (attackPlayer.cardsForIndex ({ 5 }));
-  REQUIRE (game.getAllowedMoves (PlayerRole::attack).front () == AllowedMove::addCard);
+  REQUIRE (game.getAllowedMoves (PlayerRole::attack).front () == Move::addCard);
   game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0));
   REQUIRE (game.getAllowedMoves (PlayerRole::attack).size () == 2);
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::attack).begin (), game.getAllowedMoves (PlayerRole::attack).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::addCard; }) != game.getAllowedMoves (PlayerRole::attack).end ());
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::attack).begin (), game.getAllowedMoves (PlayerRole::attack).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::pass; }) != game.getAllowedMoves (PlayerRole::attack).end ());
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::attack).begin (), game.getAllowedMoves (PlayerRole::attack).end (), [] (Move allowedMove) { return allowedMove == Move::addCard; }) != game.getAllowedMoves (PlayerRole::attack).end ());
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::attack).begin (), game.getAllowedMoves (PlayerRole::attack).end (), [] (Move allowedMove) { return allowedMove == Move::pass; }) != game.getAllowedMoves (PlayerRole::attack).end ());
 }
 
 TEST_CASE ("allowed moves defending player", "[game]")
@@ -87,11 +87,11 @@ TEST_CASE ("allowed moves defending player", "[game]")
   REQUIRE (game.getAllowedMoves (PlayerRole::defend).empty ());
   game.playerStartsAttack (attackPlayer.cardsForIndex ({ 5 }));
   REQUIRE (game.getAllowedMoves (PlayerRole::defend).size () == 2);
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::defend; }) != game.getAllowedMoves (PlayerRole::defend).end ());
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::takeCards; }) != game.getAllowedMoves (PlayerRole::defend).end ());
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (Move allowedMove) { return allowedMove == Move::defend; }) != game.getAllowedMoves (PlayerRole::defend).end ());
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (Move allowedMove) { return allowedMove == Move::takeCards; }) != game.getAllowedMoves (PlayerRole::defend).end ());
   game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0));
   REQUIRE (game.getAllowedMoves (PlayerRole::defend).size () == 1);
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (AllowedMove allowedMove) { return allowedMove == AllowedMove::takeCards; }) != game.getAllowedMoves (PlayerRole::defend).end ());
+  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (Move allowedMove) { return allowedMove == Move::takeCards; }) != game.getAllowedMoves (PlayerRole::defend).end ());
 }
 
 TEST_CASE ("allowed moves assisting player", "[game]")
@@ -99,15 +99,13 @@ TEST_CASE ("allowed moves assisting player", "[game]")
   auto gameOption = GameOption{};
   gameOption.customCardDeck = testCardDeck16 ();
   auto game = Game{ { "player1", "player2", "player3" }, gameOption };
-  auto optionalGame=std::optional<Game>{};
-  optionalGame=game;
   auto &attackPlayer = game.getAttackingPlayer ().value ();
   auto &defendPlayer = game.getDefendingPlayer ().value ();
   auto &assistingPlayer = game.getAssistingPlayer ().value ();
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).empty ());
   REQUIRE (game.playerStartsAttack (attackPlayer.cardsForIndex ({ 0 })));
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 1);
-  REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).front () == AllowedMove::addCard);
+  REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).front () == Move::addCard);
   REQUIRE (game.playerAssists (PlayerRole::assistAttacker, assistingPlayer.cardsForIndex ({ 2 })));
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).empty ());
   REQUIRE (game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0)));
@@ -115,7 +113,5 @@ TEST_CASE ("allowed moves assisting player", "[game]")
   REQUIRE (game.playerDefends (game.getTable ().at (1).first, defendPlayer.getCards ().at (0)));
   REQUIRE (game.getAllowedMoves (PlayerRole::assistAttacker).size () == 2);
 }
-
-
 
 }
