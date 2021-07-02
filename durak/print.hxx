@@ -25,28 +25,28 @@ struct Card;
 struct Player;
 class Game;
 
-std::ostream &operator<< (std::ostream &os, Card const &card);
+inline std::ostream &operator<< (std::ostream &os, Card const &card);
 
-std::ostream &operator<< (std::ostream &os, Player const &player);
+inline std::ostream &operator<< (std::ostream &os, Player const &player);
 
-std::string cardsSortedByValueWithIndex (std::vector<Card> cards);
+inline std::string cardsSortedByValueWithIndex (std::vector<Card> cards);
 
-std::string attackingPlayerWithNameAndCardIndexValueAndType (Game const &game);
+inline std::string attackingPlayerWithNameAndCardIndexValueAndType (Game const &game);
 
-std::string defendingPlayerWithNameAndCardIndexValueAndType (Game const &game);
+inline std::string defendingPlayerWithNameAndCardIndexValueAndType (Game const &game);
 
-std::string assistingPlayerWithNameAndCardIndexValueAndType (Game const &game);
+inline std::string assistingPlayerWithNameAndCardIndexValueAndType (Game const &game);
 
-std::string tableAsString (Game const &game);
+inline std::string tableAsString (Game const &game);
 
-std::ostream &
+inline std::ostream &
 operator<< (std::ostream &os, Card const &card)
 {
   os << fmt::format ("Card: {{{0} , {1}}}", card.value, magic_enum::enum_name (card.type));
   return os;
 }
 
-std::ostream &
+inline std::ostream &
 operator<< (std::ostream &os, Player const &player)
 {
   os << "Player Cards sorted by Value" << std::endl;
@@ -57,7 +57,7 @@ operator<< (std::ostream &os, Player const &player)
   return os;
 }
 
-std::string
+inline std::string
 cardsSortedByValueWithIndex (std::vector<Card> cards)
 {
   ranges::sort (cards);
@@ -72,7 +72,7 @@ cardsSortedByValueWithIndex (std::vector<Card> cards)
   return cardsMessage.str ();
 }
 
-std::string
+inline std::string
 attackingPlayerWithNameAndCardIndexValueAndType (Game const &game)
 {
   auto result = std::stringstream{};
@@ -87,7 +87,7 @@ attackingPlayerWithNameAndCardIndexValueAndType (Game const &game)
   return result.str ();
 }
 
-std::string
+inline std::string
 defendingPlayerWithNameAndCardIndexValueAndType (Game const &game)
 {
   auto result = std::stringstream{};
@@ -103,7 +103,7 @@ defendingPlayerWithNameAndCardIndexValueAndType (Game const &game)
   return result.str ();
 }
 
-std::string
+inline std::string
 assistingPlayerWithNameAndCardIndexValueAndType (Game const &game)
 {
   auto result = std::stringstream{};
@@ -119,7 +119,7 @@ assistingPlayerWithNameAndCardIndexValueAndType (Game const &game)
   return result.str ();
 }
 
-std::ostream &
+inline std::ostream &
 operator<< (std::ostream &os, HistoryEvent const &historyEvent)
 {
   std::visit (overloaded{ [&historyEvent, &os] (auto arg) {
@@ -131,7 +131,7 @@ operator<< (std::ostream &os, HistoryEvent const &historyEvent)
   return os;
 }
 
-std::string
+inline std::string
 tableAsString (Game const &game)
 {
   // TODO sorting does not match with show cards
