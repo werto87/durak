@@ -9,6 +9,7 @@
 #include "durak/player.hxx"
 #include <algorithm>
 #include <boost/assign.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/range/adaptor/indexed.hpp>
 #include <cstddef>
 #include <iostream>
@@ -383,7 +384,7 @@ public:
   durak () const
   {
     if (not checkIfGameIsOver ()) throw std::logic_error{ "calling durak and game is not over checkIfGameIsOver () == false" };
-    if (cardDeck.empty () && ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ())
+    if (cardDeck.empty () && boost::numeric_cast<unsigned long> (ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); })) == players.size ())
       {
         return {};
       }
@@ -396,7 +397,7 @@ public:
   bool
   checkIfGameIsOver () const
   {
-    return gameOver || players.size () <= 1 || (cardDeck.empty () && ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); }) == players.size ());
+    return gameOver || players.size () <= 1 || (cardDeck.empty () && boost::numeric_cast<unsigned long> (ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); })) == players.size ());
   }
 
   RoundResult
