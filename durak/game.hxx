@@ -440,7 +440,7 @@ public:
   }
 
   std::vector<Card>
-  getTableAsVector ()
+  getTableAsVector () const
   {
     auto result = std::vector<Card>{};
     for (auto cardPair : table)
@@ -605,7 +605,7 @@ public:
   }
 
   bool
-  hasCardWhichIsAllowedToAdd (PlayerRole playerRole)
+  hasCardWhichIsAllowedToAdd (PlayerRole playerRole) const
   {
     if (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker)
       {
@@ -641,7 +641,7 @@ public:
   }
 
   bool
-  hasCardWhichIsAllowedDefend (PlayerRole playerRole)
+  hasCardWhichIsAllowedDefend (PlayerRole playerRole) const
   {
     if (playerRole == PlayerRole::defend)
       {
@@ -665,33 +665,33 @@ public:
   }
 
   bool
-  isAllowedToStartAttack (PlayerRole playerRole)
+  isAllowedToStartAttack (PlayerRole playerRole) const
   {
     return cardsAllowedToPlaceOnTable () >= 1 && (not attackStarted and playerRole == PlayerRole::attack and table.empty () and getAttackingPlayer () and not getAttackingPlayer ().value ().getCards ().empty () and getDefendingPlayer () and not getDefendingPlayer ().value ().getCards ().empty ());
   }
   bool
-  isAllowedToAddCard (PlayerRole playerRole)
+  isAllowedToAddCard (PlayerRole playerRole) const
   {
     return cardsAllowedToPlaceOnTable () >= 1 && ((playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker) and attackStarted and hasCardWhichIsAllowedToAdd (playerRole));
   }
   bool
-  isAllowedToPass (PlayerRole playerRole)
+  isAllowedToPass (PlayerRole playerRole) const
   {
     return attackStarted and (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker) and countOfNotBeatenCardsOnTable () == 0;
   }
   bool
-  isAllowedToDefend (PlayerRole playerRole)
+  isAllowedToDefend (PlayerRole playerRole) const
   {
     return playerRole == PlayerRole::defend and countOfNotBeatenCardsOnTable () > 0 and hasCardWhichIsAllowedDefend (playerRole);
   }
   bool
-  isAllowedToTakeCards (PlayerRole playerRole)
+  isAllowedToTakeCards (PlayerRole playerRole) const
   {
     return playerRole == PlayerRole::defend and not table.empty ();
   }
 
   std::vector<Move>
-  getAllowedMoves (PlayerRole playerRole)
+  getAllowedMoves (PlayerRole playerRole) const
   {
     // TODO if two players attack it make sense to wait (do nothing for a couple of seconds maybe other player adds card)
     auto allowedMoves = std::vector<Move>{};
