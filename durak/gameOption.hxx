@@ -2,7 +2,27 @@
 #define DAA68818_EE93_4A58_9794_091F4C795F8E
 #include "durak/card.hxx"
 #include "durak/constant.hxx"
+#include <boost/fusion/adapted/boost_tuple.hpp>
+#include <boost/fusion/adapted/std_pair.hpp>
+#include <boost/fusion/adapted/struct/adapt_struct.hpp>
+#include <boost/fusion/adapted/struct/define_struct.hpp>
+#include <boost/fusion/algorithm/query/count.hpp>
+#include <boost/fusion/functional.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/include/algorithm.hpp>
+#include <boost/fusion/include/at.hpp>
+#include <boost/fusion/include/boost_tuple.hpp>
+#include <boost/fusion/include/count.hpp>
+#include <boost/fusion/include/define_struct.hpp>
+#include <boost/fusion/include/std_pair.hpp>
+#include <boost/fusion/sequence/intrinsic/at.hpp>
+#include <boost/fusion/sequence/intrinsic_fwd.hpp>
 #include <boost/optional.hpp>
+#include <boost/tuple/tuple.hpp>
+#include <optional>
+#include <string>
+#include <sys/types.h>
+#include <tuple>
 #include <vector>
 namespace durak
 {
@@ -15,4 +35,6 @@ struct GameOption
   boost::optional<std::vector<Card>> customCardDeck{}; // if set ignores maxCardValue and typeCount
 };
 }
+BOOST_FUSION_ADAPT_STRUCT (durak::GameOption, maxCardValue, numberOfCardsPlayerShouldHave, roundToStart, customCardDeck)
+
 #endif /* DAA68818_EE93_4A58_9794_091F4C795F8E */
