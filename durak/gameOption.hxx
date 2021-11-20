@@ -32,7 +32,7 @@ struct GameOption
   u_int16_t typeCount = defaultTypeCount;
   u_int16_t numberOfCardsPlayerShouldHave = defaultNumberOfCardsPlayerShouldHave;
   u_int16_t roundToStart = defaultRoundToStart;
-  boost::optional<std::vector<Card>> customCardDeck{}; // if set ignores maxCardValue and typeCount
+  std::optional<std::vector<Card>> customCardDeck{}; // if set ignores maxCardValue and typeCount
 };
 }
 BOOST_FUSION_ADAPT_STRUCT (durak::GameOption, maxCardValue, numberOfCardsPlayerShouldHave, roundToStart, customCardDeck)
