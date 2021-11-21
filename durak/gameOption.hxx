@@ -35,6 +35,6 @@ struct GameOption
   boost::optional<std::vector<Card>> customCardDeck{}; // if set ignores maxCardValue and typeCount
 };
 }
-BOOST_FUSION_ADAPT_STRUCT (durak::GameOption, maxCardValue, numberOfCardsPlayerShouldHave, roundToStart, customCardDeck)
+BOOST_FUSION_ADAPT_STRUCT (durak::GameOption, maxCardValue, typeCount, numberOfCardsPlayerShouldHave, roundToStart, customCardDeck)
 
 #endif /* DAA68818_EE93_4A58_9794_091F4C795F8E */
