@@ -55,7 +55,10 @@ target_include_directories(${TARGET_NAME} INTERFACE
 )
 
   
-
+target_compile_definitions(${TARGET_NAME} INTERFACE 
+$<$<CONFIG:DEBUG>:DEBUG>
+_LIBCPP_ENABLE_CXX20_REMOVED_TYPE_TRAITS
+)
 
 
 target_link_libraries(${TARGET_NAME} INTERFACE
@@ -67,6 +70,7 @@ target_link_libraries(${TARGET_NAME} INTERFACE
     CONAN_PKG::fmt
     CONAN_PKG::boost
     CONAN_PKG::confu_json
+
   )
 
 
