@@ -57,7 +57,6 @@ target_include_directories(${TARGET_NAME} INTERFACE
   
 target_compile_definitions(${TARGET_NAME} INTERFACE 
 $<$<CONFIG:DEBUG>:DEBUG>
-_LIBCPP_ENABLE_CXX20_REMOVED_TYPE_TRAITS
 )
 
 
