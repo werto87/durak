@@ -7,6 +7,7 @@ add_executable(${TEST_TARGET_NAME}
 "game.cxx"
 "player.cxx"
 "constant.hxx"
+"move.cxx"
 ${TARGET_SOURCES}
  )
 
