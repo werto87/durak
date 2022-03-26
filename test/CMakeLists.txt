@@ -14,7 +14,9 @@ ${TARGET_SOURCES}
  if (CMAKE_BINARY_DIR)
  target_compile_definitions(${TEST_TARGET_NAME} PRIVATE PATH_TO_BINARY="${CMAKE_BINARY_DIR}")
  endif()
-
+ target_compile_definitions(${TEST_TARGET_NAME} PUBLIC
+ _LIBCPP_ENABLE_CXX20_REMOVED_TYPE_TRAITS
+ )
 target_link_libraries(${TEST_TARGET_NAME}
 ${PROJECT_WARNINGS}
 ${PROJECT_OPTIONS}

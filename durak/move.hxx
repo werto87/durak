@@ -85,6 +85,16 @@ operator!= (durak::DrawCardsFromTable const &x, durak::DrawCardsFromTable const 
 {
   return !(x == y);
 }
+inline bool
+operator== (durak::Defend const &x, durak::Defend const &y)
+{
+  return x.card == y.card && x.cardToBeat == y.cardToBeat;
+}
+inline bool
+operator!= (durak::Defend const &x, durak::Defend const &y)
+{
+  return !(x == y);
+}
 
 inline bool
 operator== (durak::HistoryEvent const &x, durak::HistoryEvent const &y)
@@ -115,6 +125,10 @@ operator== (durak::HistoryEvent const &x, durak::HistoryEvent const &y)
       else if (std::holds_alternative<DrawCardsFromTable> (x))
         {
           return std::get<DrawCardsFromTable> (x) == std::get<DrawCardsFromTable> (y);
+        }
+      else if (std::holds_alternative<Defend> (x))
+        {
+          return std::get<Defend> (x) == std::get<Defend> (y);
         }
       else
         {
