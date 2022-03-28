@@ -122,7 +122,7 @@ assistingPlayerWithNameAndCardIndexValueAndType (Game const &game)
 inline std::ostream &
 operator<< (std::ostream &os, HistoryEvent const &historyEvent)
 {
-  std::visit (overloaded{ [&historyEvent, &os] (auto arg) {
+  std::visit (overloaded{ [&os] (auto arg) {
                 os << confu_json::type_name<decltype (arg)> ();
                 os << ": ";
                 os << confu_json::to_json (arg);
