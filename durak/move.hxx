@@ -105,7 +105,7 @@ are_equivalent (T const &l, T const &r)
 
 bool inline are_equivalent (durak::HistoryEvent const &l, durak::HistoryEvent const &r)
 {
-  return (l.index () == r.index ()) && std::visit ([&] (auto const &l, auto const &r) { return are_equivalent (l, r); }, l, r);
+  return (l.index () == r.index ()) && std::visit ([] (auto const &l, auto const &r) { return are_equivalent (l, r); }, l, r);
 }
 
 inline bool
