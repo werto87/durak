@@ -96,45 +96,20 @@ operator!= (durak::Defend const &x, durak::Defend const &y)
   return !(x == y);
 }
 
+template <class T>
+bool
+are_equivalent (T const &l, T const &r)
+{
+  return l == r;
+}
+
+bool inline are_equivalent (durak::HistoryEvent const &l, durak::HistoryEvent const &r)
+{
+  return (l.index () == r.index ()) && std::visit ([&] (auto const &l, auto const &r) { return are_equivalent (l, r); }, l, r);
+}
+
 inline bool
 operator== (durak::HistoryEvent const &x, durak::HistoryEvent const &y)
 {
-  using namespace durak;
-  if (x.index () != y.index ())
-    {
-      return false;
-    }
-  else
-    {
-      if (std::holds_alternative<RoundInformation> (x))
-        {
-          return std::get<RoundInformation> (x) == std::get<RoundInformation> (y);
-        }
-      else if (std::holds_alternative<StartAttack> (x))
-        {
-          return std::get<StartAttack> (x) == std::get<StartAttack> (y);
-        }
-      else if (std::holds_alternative<AssistAttack> (x))
-        {
-          return std::get<AssistAttack> (x) == std::get<AssistAttack> (y);
-        }
-      else if (std::holds_alternative<Pass> (x))
-        {
-          return std::get<Pass> (x) == std::get<Pass> (y);
-        }
-      else if (std::holds_alternative<DrawCardsFromTable> (x))
-        {
-          return std::get<DrawCardsFromTable> (x) == std::get<DrawCardsFromTable> (y);
-        }
-      else if (std::holds_alternative<Defend> (x))
-        {
-          return std::get<Defend> (x) == std::get<Defend> (y);
-        }
-      else
-        {
-          std::cout << "not allowed durak::HistoryEvent" << std::endl;
-          abort ();
-          return false;
-        }
-    }
+  return are_equivalent (x, y);
 }
