@@ -116,4 +116,16 @@ TEST_CASE ("allowed moves assisting player", "[game]")
   // ranges::for_each (history, [] (auto const &historyEvent) { std::cout << historyEvent << std::endl; });
 }
 
+TEST_CASE ("game option set trump", "[game]")
+{
+  auto gameOption = GameOption{};
+  gameOption.customCardDeck = testCardDeck16 ();
+  auto game = Game{ { "player1", "player2", "player3" }, gameOption };
+  REQUIRE (game.getTrump () == Type::hearts);
+  gameOption.customCardDeck = testCardDeck16 ();
+  gameOption.trump = Type::clubs;
+  auto otherGame = Game{ { "player1", "player2", "player3" }, gameOption };
+  REQUIRE (game.getTrump () != otherGame.getTrump ());
+}
+
 }

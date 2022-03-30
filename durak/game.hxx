@@ -127,7 +127,7 @@ public:
       {
         cardDeck = generateCardDeck (gameOption.maxCardValue, gameOption.typeCount);
       }
-    trump = cardDeck.front ().type;
+    trump = gameOption.trump ? gameOption.trump.value () : cardDeck.front ().type;
     // TODO use move itterator
     std::transform (playerNames.begin (), playerNames.end (), std::back_inserter (players), [] (auto playername) {
       auto player = Player{};
