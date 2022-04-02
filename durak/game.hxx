@@ -127,6 +127,7 @@ public:
       {
         cardDeck = generateCardDeck (gameOption.maxCardValue, gameOption.typeCount);
       }
+
     trump = gameOption.trump ? gameOption.trump.value () : cardDeck.front ().type;
     // TODO use move itterator
     std::transform (playerNames.begin (), playerNames.end (), std::back_inserter (players), [] (auto playername) {
@@ -134,7 +135,14 @@ public:
       player.id.swap (playername);
       return player;
     });
-    std::for_each (players.begin (), players.end (), [this] (Player &player) { playerDrawsCardsFromDeck (player, numberOfCardsPlayerShouldHave); });
+    if (gameOption.cardsInHands)
+      {
+        std::for_each (players.begin (), players.end (), [index = size_t{ 0 }, cardsInHands = gameOption.cardsInHands] (Player &player) mutable { player.takeCards (std::move (cardsInHands->at (index++))); });
+      }
+    else
+      {
+        std::for_each (players.begin (), players.end (), [this] (Player &player) { playerDrawsCardsFromDeck (player, numberOfCardsPlayerShouldHave); });
+      }
   }
 
   Game (std::vector<std::string> &&playerNames, std::vector<Card> &&cards) : cardDeck{ cards }

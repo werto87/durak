@@ -32,8 +32,9 @@ struct GameOption
   u_int16_t typeCount = defaultTypeCount;
   u_int16_t numberOfCardsPlayerShouldHave = defaultNumberOfCardsPlayerShouldHave;
   u_int16_t roundToStart = defaultRoundToStart;
-  boost::optional<Type> trump{};                       // if set overides the trump which is the last card in deck
-  boost::optional<std::vector<Card>> customCardDeck{}; // if set ignores maxCardValue and typeCount
+  boost::optional<Type> trump{};                                  // if set overides the trump which is the last card in deck
+  boost::optional<std::vector<Card>> customCardDeck{};            // if set ignores maxCardValue and typeCount
+  boost::optional<std::vector<std::vector<Card>>> cardsInHands{}; // if set ignores maxCardValue and typeCount
 };
 }
 BOOST_FUSION_ADAPT_STRUCT (durak::GameOption, maxCardValue, typeCount, numberOfCardsPlayerShouldHave, roundToStart, customCardDeck)

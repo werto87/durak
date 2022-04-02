@@ -128,4 +128,16 @@ TEST_CASE ("game option set trump", "[game]")
   REQUIRE (game.getTrump () != otherGame.getTrump ());
 }
 
+TEST_CASE ("game option set cards for player", "[game]")
+{
+  auto gameOption = GameOption{};
+  gameOption.cardsInHands = std::vector<std::vector<Card>>{};
+  auto playerOneCards = std::vector<Card>{ { 1, Type::clubs }, { 1, Type::hearts } };
+  auto playerTwoCards = std::vector<Card>{ { 2, Type::clubs }, { 2, Type::hearts } };
+  gameOption.cardsInHands->push_back (playerOneCards);
+  gameOption.cardsInHands->push_back (playerTwoCards);
+  auto game = Game{ { "player1", "player2" }, gameOption };
+  REQUIRE (game.getPlayers ().at (0).getCards () == playerOneCards);
+  REQUIRE (game.getPlayers ().at (1).getCards () == playerTwoCards);
+}
 }
