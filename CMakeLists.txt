@@ -5,7 +5,7 @@ project(project VERSION 1.0.0
   LANGUAGES CXX
   ) 
 cmake_policy(SET CMP0015 NEW)
-
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ########## enable cache system
 include(cmake/Cache.cmake)
