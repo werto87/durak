@@ -10,6 +10,8 @@
 #include <sstream>
 #include <vector>
 
+namespace durak
+{
 // helper type for the visitor #4
 template <class... Ts> struct overloaded : Ts...
 {
@@ -17,9 +19,6 @@ template <class... Ts> struct overloaded : Ts...
 };
 // explicit deduction guide (not needed as of C++20)
 template <class... Ts> overloaded (Ts...) -> overloaded<Ts...>;
-
-namespace durak
-{
 
 struct Card;
 struct Player;
