@@ -71,29 +71,5 @@ target_link_libraries(${TARGET_NAME} INTERFACE
     CONAN_PKG::confu_json
 
   )
-
-
-
-
-####### create executable
-OPTION(BUILD_TESTS "enable tests" OFF)
-IF(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(test) 
-ENDIF(BUILD_TESTS)
-
-
- 
-
-
-####### include what you use
-#find_program(iwyu_path NAMES include-what-you-use iwyu)
-#set_property(TARGET ${TARGET_NAME} PROPERTY CXX_INCLUDE_WHAT_YOU_USE ${iwyu_path})
-
-
-#print all variables used in cmake
-# get_cmake_property(_variableNames VARIABLES)
-# list (SORT _variableNames)
-# foreach (_variableName ${_variableNames})
-#    message(STATUS "${_variableName}=${${_variableName}}")
-# endforeach()
+enable_testing()
+add_subdirectory(test)
