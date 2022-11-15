@@ -201,38 +201,43 @@ public:
   bool
   playerAssists (PlayerRole playerRole, std::vector<Card> const &cards)
   {
-    auto result = false;
     if (cardsAllowedToPlaceOnTable () >= cards.size ())
       {
         if (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker)
           {
-            // TODO maybe we can do something here to make it more readable
             auto tableVector = getTableAsVector ();
-            auto sortByValue = [] (auto const &x, auto const &y) { return x.value > y.value; };
-            ranges::sort (tableVector, sortByValue);
-            auto equal = [] (auto const &x, auto const &y) { return x.value == y.value; };
-            tableVector.erase (std::unique (tableVector.begin (), tableVector.end (), equal), tableVector.end ());
-            auto isAllowedToPutCards = true;
-            for (auto const &card : cards)
+            ranges::sort (tableVector);
+            for (auto i = size_t{}; i != cards.size (); ++i)
               {
-                if (not ranges::binary_search (tableVector, card, sortByValue))
+                if (ranges::binary_search (tableVector, cards.at (i)))
                   {
-                    isAllowedToPutCards = false;
-                    break;
+                    return false;
                   }
               }
-            if (isAllowedToPutCards)
+            auto tableValues = std::vector<decltype (Card::value)>{};
+            ranges::transform (tableVector, ranges::back_inserter (tableValues), [] (auto const &card) { return card.value; });
+            for (auto i = size_t{}; i != cards.size (); ++i)
               {
-                result = true;
+                if (not ranges::binary_search (tableValues, cards.at (i).value))
+                  {
+                    return false;
+                  }
+              }
+            if (players.at (static_cast<size_t> (playerRole)).putCards (cards, table))
+              {
                 auto assistAttack = AssistAttack{};
                 assistAttack.cards = cards;
                 assistAttack.playerRole = playerRole;
                 history.push_back (assistAttack);
-                players.at (static_cast<size_t> (playerRole)).putCards (cards, table);
+                return true;
+              }
+            else
+              {
+                return false;
               }
           }
       }
-    return result;
+    return false;
   }
 
   // defending player can try to beat card on the table

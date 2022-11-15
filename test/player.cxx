@@ -155,4 +155,20 @@ TEST_CASE ("cardsForIndex out of bound", "[cardsForIndex]")
   REQUIRE_THROWS (player.cardsForIndex ({ 41, 1, 2 }));
 }
 
+TEST_CASE ("card player has", "[put cards]")
+{
+  auto player = Player{};
+  player.takeCards ({ { .value = 1, .type = Type::clubs } });
+  auto target = std::vector<std::pair<Card, boost::optional<Card>>>{};
+  REQUIRE (player.putCards ({ { .value = 1, .type = Type::clubs } }, target));
+}
+
+TEST_CASE ("put cards card which player does not have", "[put cards]")
+{
+  auto player = Player{};
+  player.takeCards ({ { .value = 1, .type = Type::clubs } });
+  auto target = std::vector<std::pair<Card, boost::optional<Card>>>{};
+  REQUIRE (player.putCards ({ { .value = 42, .type = Type::clubs } }, target) == false);
+}
+
 }

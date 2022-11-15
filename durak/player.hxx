@@ -2,6 +2,7 @@
 #define A85D1720_A39F_43B7_B56C_7843E3A02A0D
 #include "durak/card.hxx"
 #include <algorithm>
+#include <boost/numeric/conversion/cast.hpp>
 #include <boost/optional.hpp>
 #include <cstddef>
 #include <pipes/dev_null.hpp>
@@ -16,12 +17,20 @@ namespace durak
 struct Player
 {
 public:
-  void
+  bool
   putCards (std::vector<Card> const &cardsToPut, std::vector<std::pair<Card, boost::optional<Card>>> &target)
   {
     auto cardsToMove = std::stable_partition (cards.begin (), cards.end (), [&cardsToPut] (Card const &card) { return std::find (cardsToPut.begin (), cardsToPut.end (), card) == cardsToPut.end (); });
-    std::for_each (cardsToMove, cards.end (), [&target] (Card &card) { target.emplace_back (std::pair<Card, boost::optional<Card>>{ std::move (card), {} }); });
-    cards.erase (cardsToMove, cards.end ());
+    if (std::distance (cardsToMove, cards.end ()) != boost::numeric_cast<int> (cardsToPut.size ()))
+      {
+        return false;
+      }
+    else
+      {
+        std::for_each (cardsToMove, cards.end (), [&target] (Card &card) { target.emplace_back (std::pair<Card, boost::optional<Card>>{ card, {} }); });
+        cards.erase (cardsToMove, cards.end ());
+        return true;
+      }
   }
 
   void
