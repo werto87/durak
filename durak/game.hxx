@@ -104,7 +104,7 @@ struct GameState
 class Game
 {
 public:
-  Game () = default;
+  Game () { setNewRoundInformation (); }
   explicit Game (std::vector<std::string> &&playerNames) : cardDeck{ generateCardDeck () }
   {
     trump = cardDeck.front ().type;
@@ -115,6 +115,7 @@ public:
       return player;
     });
     std::for_each (players.begin (), players.end (), [this] (Player &player) { playerDrawsCardsFromDeck (player, numberOfCardsPlayerShouldHave); });
+    setNewRoundInformation ();
   }
 
   Game (std::vector<std::string> &&playerNames, GameOption gameOption) : round (gameOption.roundToStart), numberOfCardsPlayerShouldHave{ gameOption.numberOfCardsPlayerShouldHave }
@@ -143,6 +144,7 @@ public:
       {
         std::for_each (players.begin (), players.end (), [this] (Player &player) { playerDrawsCardsFromDeck (player, numberOfCardsPlayerShouldHave); });
       }
+    setNewRoundInformation ();
   }
 
   Game (std::vector<std::string> &&playerNames, std::vector<Card> &&cards) : cardDeck{ cards }
@@ -155,9 +157,10 @@ public:
       return player;
     });
     std::for_each (players.begin (), players.end (), [this] (Player &player) { playerDrawsCardsFromDeck (player, numberOfCardsPlayerShouldHave); });
+    setNewRoundInformation ();
   }
 
-  Game (GameState gameState) : cardDeck{ gameState.cardDeck }, players{ gameState.players }, table{ gameState.table }, trump{ gameState.trump }, attackStarted{ gameState.attackStarted }, gameOver{ gameState.gameOver }, round{ gameState.round }, numberOfCardsPlayerShouldHave{ gameState.numberOfCardsPlayerShouldHave } {}
+  Game (GameState gameState) : cardDeck{ gameState.cardDeck }, players{ gameState.players }, table{ gameState.table }, trump{ gameState.trump }, attackStarted{ gameState.attackStarted }, gameOver{ gameState.gameOver }, round{ gameState.round }, numberOfCardsPlayerShouldHave{ gameState.numberOfCardsPlayerShouldHave } { setNewRoundInformation (); }
 
   // attack starts round and can only be used by playr with role attack
   bool
@@ -173,7 +176,7 @@ public:
                 attackStarted = true;
                 auto startAttack = StartAttack{};
                 startAttack.cards = cards;
-                history.push_back (startAttack);
+                history.emplace_back (startAttack);
                 return true;
               }
             else
@@ -223,7 +226,7 @@ public:
                 auto assistAttack = AssistAttack{};
                 assistAttack.cards = cards;
                 assistAttack.playerRole = playerRole;
-                history.push_back (assistAttack);
+                history.emplace_back (assistAttack);
                 return true;
               }
             else
@@ -250,7 +253,7 @@ public:
             auto defend = Defend{};
             defend.cardToBeat = cardToBeat;
             defend.card = card;
-            history.push_back (defend);
+            history.emplace_back (defend);
             return true;
           }
         else
@@ -413,11 +416,11 @@ public:
   {
     if (attackingSuccess)
       {
-        history.push_back (DrawCardsFromTable{});
+        history.emplace_back (DrawCardsFromTable{});
       }
     else
       {
-        history.push_back (Pass{});
+        history.emplace_back (Pass{});
       }
     auto roundResult = RoundResult{};
     roundResult.cards = getTableAsVector ();
@@ -430,11 +433,7 @@ public:
     gameOver = checkIfGameIsOver ();
     calculateNextRoles (attackingSuccess);
     roundResult.deckSize = cardDeck.size ();
-    auto roundInformation = RoundInformation{};
-    if (auto attackingPlayer = getAttackingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::attack, attackingPlayer.value ().id });
-    if (auto defendingPlayer = getDefendingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::defend, defendingPlayer.value ().id });
-    if (auto assistingPlayer = getAssistingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::assistAttacker, assistingPlayer.value ().id });
-    history.push_back (roundInformation);
+    setNewRoundInformation ();
     return roundResult;
   }
 
@@ -720,6 +719,16 @@ public:
   getHistory () const
   {
     return history;
+  }
+
+  void
+  setNewRoundInformation ()
+  {
+    auto roundInformation = RoundInformation{};
+    if (auto attackingPlayer = getAttackingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::attack, attackingPlayer.value ().id });
+    if (auto defendingPlayer = getDefendingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::defend, defendingPlayer.value ().id });
+    if (auto assistingPlayer = getAssistingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::assistAttacker, assistingPlayer.value ().id });
+    history.emplace_back (roundInformation);
   }
 
 private:
