@@ -169,11 +169,6 @@ public:
           {
             if (cardsHaveSameValue (cards))
               {
-                auto roundInformation = RoundInformation{};
-                roundInformation.playerRoles.push_back ({ PlayerRole::attack, attackingPlayer.value ().id });
-                if (auto defendingPlayer = getDefendingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::defend, defendingPlayer.value ().id });
-                if (auto assistingPlayer = getAssistingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::assistAttacker, assistingPlayer.value ().id });
-                history.push_back (roundInformation);
                 attackingPlayer.value ().putCards (cards, table);
                 attackStarted = true;
                 auto startAttack = StartAttack{};
@@ -435,6 +430,11 @@ public:
     gameOver = checkIfGameIsOver ();
     calculateNextRoles (attackingSuccess);
     roundResult.deckSize = cardDeck.size ();
+    auto roundInformation = RoundInformation{};
+    if (auto attackingPlayer = getAttackingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::attack, attackingPlayer.value ().id });
+    if (auto defendingPlayer = getDefendingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::defend, defendingPlayer.value ().id });
+    if (auto assistingPlayer = getAssistingPlayer ()) roundInformation.playerRoles.push_back ({ PlayerRole::assistAttacker, assistingPlayer.value ().id });
+    history.push_back (roundInformation);
     return roundResult;
   }
 
