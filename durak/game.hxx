@@ -731,6 +731,10 @@ public:
     history.emplace_back (roundInformation);
   }
 
+  uint64_t cardDeckSize(){
+    return cardDeck.size();
+  }
+
 private:
   std::vector<Card> cardDeck{};
   std::vector<Player> players{};
