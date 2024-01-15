@@ -10,7 +10,7 @@ add_executable(${TEST_TARGET_NAME}
 "move.cxx"
 ${TARGET_SOURCES}
  )
-
+find_package(Catch2 REQUIRED)
  if (CMAKE_BINARY_DIR)
  target_compile_definitions(${TEST_TARGET_NAME} PRIVATE PATH_TO_BINARY="${CMAKE_BINARY_DIR}")
  endif()
@@ -21,13 +21,8 @@ target_link_libraries(${TEST_TARGET_NAME}
 ${PROJECT_WARNINGS}
 ${PROJECT_OPTIONS}
  ${TARGET_NAME}
- CONAN_PKG::catch2
- CONAN_PKG::range-v3
- CONAN_PKG::pipes
- CONAN_PKG::magic_enum
- CONAN_PKG::fmt
- CONAN_PKG::boost
-${TARGET_LIBS}
+        Catch2::Catch2WithMain
+        ${TARGET_LIBS}
 )
 target_include_directories(${TEST_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})
 

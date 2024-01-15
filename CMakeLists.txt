@@ -1,4 +1,3 @@
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 cmake_minimum_required(VERSION 3.17)
 project(project VERSION 1.0.0
   DESCRIPTION project
@@ -10,6 +9,12 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ########## enable cache system
 include(cmake/Cache.cmake)
 
+find_package(Boost REQUIRED)
+find_package(range-v3 REQUIRED)
+find_package(confu_json REQUIRED)
+find_package(fmt REQUIRED)
+find_package(magic_enum REQUIRED)
+find_package(pipes REQUIRED)
 
 ########## link against the libs to apply the configurations to the target
 # compiler warnings
@@ -32,10 +37,6 @@ target_compile_features(${PROJECT_OPTIONS} INTERFACE cxx_std_20)
 
 # allow for static analysis options
 #include(cmake/StaticAnalyzers.cmake) 
- 
-######## conan setup
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
 
 
 set(TARGET_NAME durak)
@@ -63,13 +64,12 @@ $<$<CONFIG:DEBUG>:DEBUG>
 target_link_libraries(${TARGET_NAME} INTERFACE
     ${PROJECT_WARNINGS}
     ${PROJECT_OPTIONS}
-    CONAN_PKG::range-v3
-    CONAN_PKG::pipes
-    CONAN_PKG::magic_enum
-    CONAN_PKG::fmt
-    CONAN_PKG::boost
-    CONAN_PKG::confu_json
-
+    Boost::headers
+    range-v3::range-v3
+    confu_json::confu_json
+    magic_enum::magic_enum
+    fmt::fmt
+    pipes::pipes
   )
 enable_testing()
 add_subdirectory(test)
