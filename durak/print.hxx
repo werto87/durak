@@ -4,7 +4,7 @@
 #include <confu_json/confu_json.hxx>
 #include <fmt/format.h>
 #include <iostream>
-#include <magic_enum.hpp>
+#include <magic_enum/magic_enum.hpp>
 #include <pipes/pipes.hpp>
 #include <range/v3/all.hpp>
 #include <sstream>
