@@ -11,7 +11,6 @@
 #include <cstdlib>
 #include <iostream>
 #include <iterator>
-#include <pipes/pipes.hpp>
 #include <range/v3/algorithm/find_if.hpp>
 #include <range/v3/range.hpp>
 #include <stdexcept>

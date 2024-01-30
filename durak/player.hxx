@@ -5,8 +5,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/optional.hpp>
 #include <cstddef>
-#include <pipes/dev_null.hpp>
-#include <pipes/pipes.hpp>
 #include <range/v3/all.hpp>
 #include <stdexcept>
 #include <string>
@@ -51,7 +49,11 @@ public:
   {
     if (cardIndex.size () > cards.size ()) throw std::logic_error ("cardIndex.size() > cards.size ()" + std::to_string (cardIndex.size ()) + " != " + std::to_string (cards.size ()));
     auto result = std::vector<Card>{};
-    pipes::mux (ranges::to<std::vector> (ranges::views::iota (size_t{}, cards.size ())), cards) >>= pipes::filter ([&cardIndex] (int i, auto) { return std::find (cardIndex.begin (), cardIndex.end (), i) != cardIndex.end (); }) >>= pipes::transform ([] (auto, auto &&card) { return card; }) >>= pipes::push_back (result);
+    std::ranges::copy_if(cards,std::back_inserter (result),[index=0,&cardIndex](auto const&) mutable {
+      auto _result=std::ranges::find (cardIndex.begin (), cardIndex.end (), index) != cardIndex.end ();
+      index++;
+      return _result;
+    });
     if (cardIndex.size () != result.size ()) throw std::logic_error ("cardIndex.size() != result.size()" + std::to_string (cardIndex.size ()) + " != " + std::to_string (result.size ()));
     return result;
   }

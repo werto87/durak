@@ -1,30 +1,18 @@
-set(TEST_TARGET_NAME _test)
-
-#get_target_property(TARGET_SOURCES ${TARGET_NAME} SOURCES)
-#get_target_property(TARGET_LIBS ${TARGET_NAME} LINK_LIBRARIES)
-add_executable(${TEST_TARGET_NAME} 
-"main.cxx"
-"game.cxx"
-"player.cxx"
-"constant.hxx"
-"move.cxx"
-${TARGET_SOURCES}
- )
-find_package(Catch2 REQUIRED)
- if (CMAKE_BINARY_DIR)
- target_compile_definitions(${TEST_TARGET_NAME} PRIVATE PATH_TO_BINARY="${CMAKE_BINARY_DIR}")
- endif()
- target_compile_definitions(${TEST_TARGET_NAME} PUBLIC
- _LIBCPP_ENABLE_CXX20_REMOVED_TYPE_TRAITS
- )
-target_link_libraries(${TEST_TARGET_NAME}
-${PROJECT_WARNINGS}
-${PROJECT_OPTIONS}
- ${TARGET_NAME}
+add_executable(_test
+        constant.hxx
+        game.cxx
+        main.cxx
+        move.cxx
+        player.cxx
+        )
+find_package(Catch2)
+target_link_libraries(_test
+        myproject_options
+        myproject_warnings
+        durak
         Catch2::Catch2WithMain
-        ${TARGET_LIBS}
-)
-target_include_directories(${TEST_TARGET_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})
+        )
+target_include_directories(_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_SOURCE_DIR})
 
-add_test(NAME ${TEST_TARGET_NAME}
-         COMMAND ${TEST_TARGET_NAME} -r junit) 
+add_test(NAME _test
+        COMMAND _test -r junit)

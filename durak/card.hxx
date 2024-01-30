@@ -4,9 +4,6 @@
 #include <algorithm>
 #include <cstddef>
 #include <optional>
-#include <pipes/pipes.hpp>
-#include <pipes/push_back.hpp>
-#include <pipes/transform.hpp>
 #include <random>
 #include <range/v3/all.hpp>
 #include <sys/types.h>
@@ -64,9 +61,6 @@ inline bool hasSameValue (Card const &x, Card const &y);
 
 inline bool cardsHaveSameValue (std::vector<Card> const &cards);
 
-// takes an unsorted cards vector sorts it and returns a vector with cards for the indexes
-std::vector<Card> sortedCardIndexing (std::vector<Card> cards, std::vector<size_t> const &indexes);
-
 inline bool
 operator== (Card const &x, Card const &y)
 {
@@ -77,15 +71,6 @@ inline bool
 operator!= (Card const &x, Card const &y)
 {
   return !(x == y);
-}
-
-inline std::vector<Card>
-sortedCardIndexing (std::vector<Card> cards, std::vector<size_t> const &indexes)
-{
-  auto result = std::vector<Card>{};
-  ranges::sort (cards);
-  pipes::mux (ranges::to_vector (ranges::views::iota (size_t{ 1 }, cards.size () + 1)), cards) >>= pipes::filter ([&indexes] (size_t i, Card) { return indexes.end () != ranges::find (indexes, i); }) >>= pipes::transform ([] (size_t, Card const &card) { return card; }) >>= pipes::push_back (result);
-  return result;
 }
 
 inline bool

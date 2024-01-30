@@ -1,10 +1,48 @@
-target_sources(${TARGET_NAME} PRIVATE 
- card.hxx
- game.hxx
- player.hxx
- print.hxx
- gameData.hxx
- constant.hxx
- gameOption.hxx
- move.hxx
- )
+##
+## Copyright (c) 2024 Waldemar Schneider (w-schneider1987 at web dot de)
+##
+## Distributed under the Boost Software License, Version 1.0.
+## (See accompanying file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+
+
+add_library(durak INTERFACE)
+
+
+add_library(myproject::durak ALIAS durak)
+
+
+find_package(range-v3)
+find_package(fmt)
+find_package(confu_json)
+find_package(Boost)
+
+
+target_link_libraries(durak INTERFACE
+        range-v3::range-v3
+        fmt::fmt
+        confu_json::confu_json
+        boost::boost
+        )
+
+target_include_directories(durak INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>)
+
+target_compile_features(durak INTERFACE cxx_std_20)
+
+set_target_properties(
+        durak
+        PROPERTIES VERSION ${PROJECT_VERSION}
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN YES)
+
+install(FILES
+        constant.hxx
+        game.hxx
+        gameData.hxx
+        gameOption.hxx
+        move.hxx
+        player.hxx
+        print.hxx
+        DESTINATION include/durak
+        )
+install(TARGETS durak DESTINATION lib)

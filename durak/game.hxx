@@ -15,7 +15,6 @@
 #include <iostream>
 #include <iterator>
 #include <numeric>
-#include <pipes/pipes.hpp>
 #include <random>
 #include <range/v3/algorithm/find_if.hpp>
 #include <range/v3/all.hpp>
@@ -285,13 +284,6 @@ public:
     return std::accumulate (table.begin (), table.end (), size_t{ 0 }, [] (auto const &x, std::pair<Card, boost::optional<Card>> const &y) { return x + (y.second.has_value () ? 0 : 1); });
   }
 
-  std::vector<std::pair<size_t, Card>>
-  cardsNotBeatenOnTableWithIndex () const
-  {
-    auto results = std::vector<std::pair<size_t, Card>>{};
-    pipes::mux (ranges::to<std::vector> (ranges::views::iota (size_t{}, getTable ().size ())), getTable ()) >>= pipes::filter ([] (int, std::pair<Card, boost::optional<Card>> b) { return not b.second.has_value (); }) >>= pipes::transform ([] (int a, std::pair<Card, boost::optional<Card>> b) { return std::make_pair (a, b.first); }) >>= pipes::push_back (results);
-    return results;
-  }
 
   size_t
   cardsAllowedToPlaceOnTable () const
