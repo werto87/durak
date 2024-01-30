@@ -36,6 +36,7 @@ set_target_properties(
         VISIBILITY_INLINES_HIDDEN YES)
 
 install(FILES
+        card.hxx
         constant.hxx
         game.hxx
         gameData.hxx
