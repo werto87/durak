@@ -29,12 +29,6 @@ target_include_directories(durak INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DI
 
 target_compile_features(durak INTERFACE cxx_std_20)
 
-set_target_properties(
-        durak
-        PROPERTIES VERSION ${PROJECT_VERSION}
-        CXX_VISIBILITY_PRESET hidden
-        VISIBILITY_INLINES_HIDDEN YES)
-
 install(FILES
         card.hxx
         constant.hxx
