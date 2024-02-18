@@ -11,14 +11,12 @@ add_library(durak INTERFACE)
 add_library(myproject::durak ALIAS durak)
 
 
-find_package(range-v3)
 find_package(fmt)
 find_package(confu_json)
 find_package(Boost)
 
 
 target_link_libraries(durak INTERFACE
-        range-v3::range-v3
         fmt::fmt
         confu_json::confu_json
         boost::boost

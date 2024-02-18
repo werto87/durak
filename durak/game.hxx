@@ -16,12 +16,10 @@
 #include <iterator>
 #include <numeric>
 #include <random>
-#include <range/v3/algorithm/find_if.hpp>
-#include <range/v3/all.hpp>
-#include <range/v3/view/filter.hpp>
 #include <stdexcept>
 #include <sys/types.h>
 #include <vector>
+#include <ranges>
 namespace durak
 {
 
@@ -203,19 +201,19 @@ public:
         if (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker)
           {
             auto tableVector = getTableAsVector ();
-            ranges::sort (tableVector);
+            std::ranges::sort (tableVector);
             for (auto i = size_t{}; i != cards.size (); ++i)
               {
-                if (ranges::binary_search (tableVector, cards.at (i)))
+                if (std::ranges::binary_search (tableVector, cards.at (i)))
                   {
                     return false;
                   }
               }
             auto tableValues = std::vector<decltype (Card::value)>{};
-            ranges::transform (tableVector, ranges::back_inserter (tableValues), [] (auto const &card) { return card.value; });
+            std::ranges::transform (tableVector, std::back_inserter (tableValues), [] (auto const &card) { return card.value; });
             for (auto i = size_t{}; i != cards.size (); ++i)
               {
-                if (not ranges::binary_search (tableValues, cards.at (i).value))
+                if (not std::ranges::binary_search (tableValues, cards.at (i).value))
                   {
                     return false;
                   }
@@ -243,7 +241,7 @@ public:
   {
     if (auto defendingPlayer = getDefendingPlayer ())
       {
-        if (auto cardToBeatItr = ranges::find_if (table, [&cardToBeat] (auto const &cardAndOptionalCard) { return cardAndOptionalCard.first == cardToBeat; }); cardToBeatItr != table.end () && not cardToBeatItr->second && beats (cardToBeatItr->first, card, trump))
+        if (auto cardToBeatItr = std::ranges::find_if (table, [&cardToBeat] (auto const &cardAndOptionalCard) { return cardAndOptionalCard.first == cardToBeat; }); cardToBeatItr != table.end () && not cardToBeatItr->second && beats (cardToBeatItr->first, card, trump))
           {
             if (defendingPlayer.value ().dropCard (card))
               {
@@ -387,7 +385,7 @@ public:
   durak () const
   {
     if (not checkIfGameIsOver ()) throw std::logic_error{ "calling durak and game is not over checkIfGameIsOver () == false" };
-    if (cardDeck.empty () && boost::numeric_cast<unsigned long> (ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); })) == players.size ())
+    if (cardDeck.empty () && boost::numeric_cast<unsigned long> (std::ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); })) == players.size ())
       {
         return {};
       }
@@ -400,7 +398,7 @@ public:
   bool
   checkIfGameIsOver () const
   {
-    return gameOver || players.size () <= 1 || (cardDeck.empty () && boost::numeric_cast<unsigned long> (ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); })) == players.size ());
+    return gameOver || players.size () <= 1 || (cardDeck.empty () && boost::numeric_cast<unsigned long> (std::ranges::count_if (players, [] (Player const &player) { return player.getCards ().empty (); })) == players.size ());
   }
 
   RoundResult
@@ -631,7 +629,7 @@ public:
           }
         for (auto const &card : getTableAsVector ())
           {
-            if (ranges::find_if (playerCards, [&card] (Card const &_card) { return card.value == _card.value; }) != playerCards.end ())
+            if (std::ranges::find_if (playerCards, [&card] (Card const &_card) { return card.value == _card.value; }) != playerCards.end ())
               {
                 return true;
               }
@@ -652,9 +650,9 @@ public:
         if (auto defendingPlayer = getDefendingPlayer ())
           {
             auto playerCards = defendingPlayer->getCards ();
-            for (auto const &cardPair : getTable () | ranges::views::filter ([] (auto const &cardPair) { return !cardPair.second.has_value (); }))
+            for (auto const &cardPair : getTable () | std::ranges::views::filter ([] (auto const &cardPair) { return !cardPair.second.has_value (); }))
               {
-                if (ranges::find_if (playerCards, [&card = cardPair.first, &trump = trump] (Card const &_card) { return beats (card, _card, trump); }) != playerCards.end ())
+                if (std::ranges::find_if (playerCards, [&card = cardPair.first, &trump = trump] (Card const &_card) { return beats (card, _card, trump); }) != playerCards.end ())
                   {
                     return true;
                   }

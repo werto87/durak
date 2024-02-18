@@ -5,7 +5,6 @@
 #include <cstddef>
 #include <optional>
 #include <random>
-#include <range/v3/all.hpp>
 #include <sys/types.h>
 #include <vector>
 namespace durak

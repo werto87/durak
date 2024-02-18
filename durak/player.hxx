@@ -5,7 +5,6 @@
 #include <boost/numeric/conversion/cast.hpp>
 #include <boost/optional.hpp>
 #include <cstddef>
-#include <range/v3/all.hpp>
 #include <stdexcept>
 #include <string>
 #include <sys/types.h>
@@ -61,7 +60,7 @@ public:
   bool
   dropCard (Card const &card)
   {
-    auto cardItr = ranges::find (cards, card);
+    auto cardItr = std::ranges::find (cards, card);
     if (cardItr != cards.end ())
       {
         cards.erase (cardItr);

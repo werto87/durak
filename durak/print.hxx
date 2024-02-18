@@ -5,7 +5,6 @@
 #include <fmt/format.h>
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
-#include <range/v3/all.hpp>
 #include <sstream>
 #include <vector>
 
@@ -21,7 +20,6 @@ template <class... Ts> overloaded (Ts...) -> overloaded<Ts...>;
 
 struct Card;
 struct Player;
-class Game;
 
 inline std::ostream &operator<< (std::ostream &os, Card const &card);
 
@@ -39,7 +37,7 @@ operator<< (std::ostream &os, Player const &player)
 {
   os << "Player Cards sorted by Value" << std::endl;
   auto cards = player.getCards ();
-  ranges::sort (cards);
+  std::ranges::sort (cards);
   for (auto const &card : cards)
     os << card << std::endl;
   return os;
