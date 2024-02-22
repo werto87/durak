@@ -2,6 +2,7 @@
 #define DAA68818_EE93_4A58_9794_091F4C795F8E
 #include "durak/card.hxx"
 #include "durak/constant.hxx"
+#include "durak/gameData.hxx"
 #include <boost/fusion/adapted/boost_tuple.hpp>
 #include <boost/fusion/adapted/std_pair.hpp>
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
