@@ -2,7 +2,7 @@
 #define CB3E895C_E721_4274_A037_FDB32C4DE314
 #include "durak/game.hxx"
 #include <confu_json/confu_json.hxx>
-#include <fmt/format.h>
+#include <format>
 #include <iostream>
 #include <magic_enum/magic_enum.hpp>
 #include <sstream>
@@ -28,7 +28,7 @@ inline std::ostream &operator<< (std::ostream &os, Player const &player);
 inline std::ostream &
 operator<< (std::ostream &os, Card const &card)
 {
-  os << fmt::format ("Card: {{{0} , {1}}}", card.value, magic_enum::enum_name (card.type));
+  os << std::format ("Card: {{{0} , {1}}}", card.value, magic_enum::enum_name (card.type));
   return os;
 }
 
@@ -54,8 +54,6 @@ operator<< (std::ostream &os, HistoryEvent const &historyEvent)
               historyEvent);
   return os;
 }
-
-
 
 }
 #endif /* CB3E895C_E721_4274_A037_FDB32C4DE314 */

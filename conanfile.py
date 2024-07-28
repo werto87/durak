@@ -1,9 +1,16 @@
 from conan import ConanFile
+from conan.tools.cmake import CMake, CMakeToolchain, CMakeDeps
+from conan.tools.files import collect_libs, rmdir
 
 
 class Project(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    generators = "CMakeToolchain", "CMakeDeps"
+    generators =  "CMakeDeps"
+
+    def generate(self):
+        tc = CMakeToolchain(self)
+        tc.user_presets_path = False #workaround because this leads to useless options in cmake-tools configure
+        tc.generate()
 
     def configure(self):
         # We can control the options of our dependencies based on current options
@@ -14,9 +21,8 @@ class Project(ConanFile):
 
     def requirements(self):
         self.requires("catch2/2.13.9")
-        self.requires("fmt/9.1.0")
         self.requires("confu_json/[>=1.0.2 <2]")
-        self.requires("boost/1.84.0")
+        self.requires("boost/1.85.0")
 
 
 
