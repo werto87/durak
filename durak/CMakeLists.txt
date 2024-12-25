@@ -17,7 +17,7 @@ find_package(Boost)
 
 target_link_libraries(durak INTERFACE
         confu_json::confu_json
-        boost::boost
+        Boost::headers
         )
 
 target_include_directories(durak INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
