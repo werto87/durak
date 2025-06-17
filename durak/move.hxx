@@ -21,18 +21,20 @@ namespace durak
 {
 typedef std::vector<std::pair<PlayerRole, std::string>> PlayerRolesPlayerId;
 }
+#pragma warning(push)
+#pragma warning(disable:4003)
 BOOST_FUSION_DEFINE_STRUCT ((durak), RoundInformation, (durak::PlayerRolesPlayerId, playerRoles))
 BOOST_FUSION_DEFINE_STRUCT ((durak), StartAttack, (std::vector<durak::Card>, cards))
 BOOST_FUSION_DEFINE_STRUCT ((durak), AssistAttack, (durak::PlayerRole, playerRole) (std::vector<durak::Card>, cards))
 BOOST_FUSION_DEFINE_STRUCT ((durak), Pass, )
 BOOST_FUSION_DEFINE_STRUCT ((durak), Defend, (durak::Card, cardToBeat) (durak::Card, card))
 BOOST_FUSION_DEFINE_STRUCT ((durak), DrawCardsFromTable, )
-
+#pragma warning(pop)
 namespace durak
 {
 typedef std::variant<RoundInformation, StartAttack, AssistAttack, Pass, Defend, DrawCardsFromTable> HistoryEvent;
 
-}
+
 inline bool
 operator== (durak::RoundInformation const &x, durak::RoundInformation const &y)
 {
@@ -112,4 +114,5 @@ inline bool
 operator== (durak::HistoryEvent const &x, durak::HistoryEvent const &y)
 {
   return are_equivalent (x, y);
+}
 }

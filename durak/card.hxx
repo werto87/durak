@@ -50,7 +50,7 @@ struct Card
     return !(x < y);
   }
 
-  u_int16_t value{};
+  uint16_t value{};
   Type type{};
 };
 

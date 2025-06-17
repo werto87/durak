@@ -29,10 +29,10 @@ namespace durak
 {
 struct GameOption
 {
-  u_int16_t maxCardValue = defaultMaxCardValue;
-  u_int16_t typeCount = defaultTypeCount;
-  u_int16_t numberOfCardsPlayerShouldHave = defaultNumberOfCardsPlayerShouldHave;
-  u_int16_t roundToStart = defaultRoundToStart;
+  uint16_t maxCardValue = defaultMaxCardValue;
+  uint16_t typeCount = defaultTypeCount;
+  uint16_t numberOfCardsPlayerShouldHave = defaultNumberOfCardsPlayerShouldHave;
+  uint16_t roundToStart = defaultRoundToStart;
   boost::optional<Type> trump{};                                  // if set overrides the trump which is the last card in deck
   boost::optional<std::vector<Card>> customCardDeck{};            // if set ignores maxCardValue and typeCount
   boost::optional<std::vector<std::vector<Card>>> cardsInHands{}; // if set ignores maxCardValue and typeCount

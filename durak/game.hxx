@@ -45,12 +45,12 @@ struct RoundResult
 };
 
 inline std::vector<Card>
-generateCardDeck (u_int16_t maxValue = defaultMaxCardValue, u_int16_t typeCount = defaultTypeCount)
+generateCardDeck (uint16_t maxValue = defaultMaxCardValue, uint16_t typeCount = defaultTypeCount)
 {
   std::vector<Card> cardDeck{};
-  for (u_int16_t type = 0; type < typeCount; type++)
+  for (uint16_t type = 0; type < typeCount; type++)
     {
-      for (u_int16_t cardValue = 1; cardValue <= maxValue; cardValue++)
+      for (uint16_t cardValue = 1; cardValue <= maxValue; cardValue++)
         {
           cardDeck.push_back (Card{ .value = cardValue, .type = static_cast<Type> (type) });
         }

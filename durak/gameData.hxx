@@ -37,7 +37,7 @@ enum struct PlayerRole
 };
 }
 
-BOOST_FUSION_ADAPT_STRUCT (durak::Card, (u_int16_t, value) (durak::Type, type))
+BOOST_FUSION_ADAPT_STRUCT (durak::Card, (uint16_t, value) (durak::Type, type))
 
 BOOST_FUSION_DEFINE_STRUCT ((durak), PlayerData, (std::string, name) (std::vector<boost::optional<durak::Card>>, cards) (durak::PlayerRole, playerRole))
 
