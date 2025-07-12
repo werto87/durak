@@ -159,7 +159,7 @@ public:
 
   Game (GameState gameState) : cardDeck{ gameState.cardDeck }, players{ gameState.players }, table{ gameState.table }, trump{ gameState.trump }, attackStarted{ gameState.attackStarted }, gameOver{ gameState.gameOver }, round{ gameState.round }, numberOfCardsPlayerShouldHave{ gameState.numberOfCardsPlayerShouldHave } { setNewRoundInformation (); }
 
-  // attack starts round and can only be used by playr with role attack
+  // attack starts round and can only be used by player with role attack
   bool
   playerStartsAttack (std::vector<Card> const &cards)
   {
