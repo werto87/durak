@@ -16,10 +16,10 @@
 #include <iterator>
 #include <numeric>
 #include <random>
+#include <ranges>
 #include <stdexcept>
 #include <sys/types.h>
 #include <vector>
-#include <ranges>
 namespace durak
 {
 
@@ -157,6 +157,16 @@ public:
     setNewRoundInformation ();
   }
 
+  bool
+  vectorIsSubVectorOf (std::vector<Card> const &vector, std::vector<Card> const &subVector)
+  {
+    for (auto const &card : vector)
+      {
+        if (not std::ranges::contains (subVector, card)) return false;
+      }
+    return true;
+  }
+
   Game (GameState gameState) : cardDeck{ gameState.cardDeck }, players{ gameState.players }, table{ gameState.table }, trump{ gameState.trump }, attackStarted{ gameState.attackStarted }, gameOver{ gameState.gameOver }, round{ gameState.round }, numberOfCardsPlayerShouldHave{ gameState.numberOfCardsPlayerShouldHave } { setNewRoundInformation (); }
 
   // attack starts round and can only be used by player with role attack
@@ -165,6 +175,7 @@ public:
   {
     if (auto attackingPlayer = getAttackingPlayer ())
       {
+        if (not vectorIsSubVectorOf (cards, attackingPlayer->getCards ())) return false;
         if (cardsAllowedToPlaceOnTable () >= cards.size ())
           {
             if (cardsHaveSameValue (cards))
@@ -200,39 +211,48 @@ public:
       {
         if (playerRole == PlayerRole::attack || playerRole == PlayerRole::assistAttacker)
           {
-            auto tableVector = getTableAsVector ();
-            std::ranges::sort (tableVector);
-            for (auto i = size_t{}; i != cards.size (); ++i)
+            auto const &player = (playerRole == PlayerRole::attack) ? getAttackingPlayer () : getAssistingPlayer ();
+            if (player)
               {
-                if (std::ranges::binary_search (tableVector, cards.at (i)))
+                if (not vectorIsSubVectorOf (cards, player->getCards ())) return false;
+                auto tableVector = getTableAsVector ();
+                std::ranges::sort (tableVector);
+                for (auto i = size_t{}; i != cards.size (); ++i)
+                  {
+                    if (std::ranges::binary_search (tableVector, cards.at (i)))
+                      {
+                        return false;
+                      }
+                  }
+                auto tableValues = std::vector<decltype (Card::value)>{};
+                std::ranges::transform (tableVector, std::back_inserter (tableValues), [] (auto const &card) { return card.value; });
+                for (auto i = size_t{}; i != cards.size (); ++i)
+                  {
+                    if (not std::ranges::binary_search (tableValues, cards.at (i).value))
+                      {
+                        return false;
+                      }
+                  }
+                if (players.at (static_cast<size_t> (playerRole)).putCards (cards, table))
+                  {
+                    auto assistAttack = AssistAttack{};
+                    assistAttack.cards = cards;
+                    assistAttack.playerRole = playerRole;
+                    history.emplace_back (assistAttack);
+                    return true;
+                  }
+                else
                   {
                     return false;
                   }
-              }
-            auto tableValues = std::vector<decltype (Card::value)>{};
-            std::ranges::transform (tableVector, std::back_inserter (tableValues), [] (auto const &card) { return card.value; });
-            for (auto i = size_t{}; i != cards.size (); ++i)
-              {
-                if (not std::ranges::binary_search (tableValues, cards.at (i).value))
-                  {
-                    return false;
-                  }
-              }
-            if (players.at (static_cast<size_t> (playerRole)).putCards (cards, table))
-              {
-                auto assistAttack = AssistAttack{};
-                assistAttack.cards = cards;
-                assistAttack.playerRole = playerRole;
-                history.emplace_back (assistAttack);
-                return true;
-              }
-            else
-              {
-                return false;
               }
           }
+        return false;
       }
-    return false;
+    else
+      {
+        return false;
+      }
   }
 
   // defending player can try to beat card on the table
@@ -241,6 +261,7 @@ public:
   {
     if (auto defendingPlayer = getDefendingPlayer ())
       {
+        if (not std::ranges::contains (defendingPlayer->getCards (), card)) return false;
         if (auto cardToBeatItr = std::ranges::find_if (table, [&cardToBeat] (auto const &cardAndOptionalCard) { return cardAndOptionalCard.first == cardToBeat; }); cardToBeatItr != table.end () && not cardToBeatItr->second && beats (cardToBeatItr->first, card, trump))
           {
             if (defendingPlayer.value ().dropCard (card))
@@ -281,7 +302,6 @@ public:
   {
     return std::accumulate (table.begin (), table.end (), size_t{ 0 }, [] (auto const &x, std::pair<Card, boost::optional<Card>> const &y) { return x + (y.second.has_value () ? 0 : 1); });
   }
-
 
   size_t
   cardsAllowedToPlaceOnTable () const
@@ -721,8 +741,10 @@ public:
     history.emplace_back (roundInformation);
   }
 
-  uint64_t cardDeckSize(){
-    return cardDeck.size();
+  uint64_t
+  cardDeckSize ()
+  {
+    return cardDeck.size ();
   }
 
 private:
