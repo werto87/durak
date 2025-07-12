@@ -83,8 +83,9 @@ TEST_CASE ("allowed moves attacking player", "[game]")
   REQUIRE (game.getAllowedMoves (PlayerRole::attack).front () == Move::addCard);
   game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0));
   REQUIRE (game.getAllowedMoves (PlayerRole::attack).size () == 2);
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::attack).begin (), game.getAllowedMoves (PlayerRole::attack).end (), [] (Move allowedMove) { return allowedMove == Move::addCard; }) != game.getAllowedMoves (PlayerRole::attack).end ());
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::attack).begin (), game.getAllowedMoves (PlayerRole::attack).end (), [] (Move allowedMove) { return allowedMove == Move::pass; }) != game.getAllowedMoves (PlayerRole::attack).end ());
+  auto const& allowedMoves = game.getAllowedMoves (PlayerRole::attack);
+  REQUIRE (std::find_if (allowedMoves.begin (), allowedMoves.end (), [] (Move allowedMove) { return allowedMove == Move::addCard; }) != allowedMoves.end ());
+  REQUIRE (std::find_if (allowedMoves.begin (), allowedMoves.end (), [] (Move allowedMove) { return allowedMove == Move::pass; }) != allowedMoves.end ());
 }
 
 TEST_CASE ("allowed moves defending player", "[game]")
@@ -97,11 +98,13 @@ TEST_CASE ("allowed moves defending player", "[game]")
   REQUIRE (game.getAllowedMoves (PlayerRole::defend).empty ());
   game.playerStartsAttack (attackPlayer.cardsForIndex ({ 5 }));
   REQUIRE (game.getAllowedMoves (PlayerRole::defend).size () == 2);
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (Move allowedMove) { return allowedMove == Move::defend; }) != game.getAllowedMoves (PlayerRole::defend).end ());
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (Move allowedMove) { return allowedMove == Move::takeCards; }) != game.getAllowedMoves (PlayerRole::defend).end ());
+  auto const& allowedMovesAfterFirstAttack = game.getAllowedMoves (PlayerRole::defend);
+  REQUIRE (std::find_if (allowedMovesAfterFirstAttack.begin (), allowedMovesAfterFirstAttack.end (), [] (Move allowedMove) { return allowedMove == Move::defend; }) != allowedMovesAfterFirstAttack.end ());
+  REQUIRE (std::find_if (allowedMovesAfterFirstAttack.begin (), allowedMovesAfterFirstAttack.end (), [] (Move allowedMove) { return allowedMove == Move::takeCards; }) != allowedMovesAfterFirstAttack.end ());
   game.playerDefends (game.getTable ().front ().first, defendPlayer.getCards ().at (0));
   REQUIRE (game.getAllowedMoves (PlayerRole::defend).size () == 1);
-  REQUIRE (std::find_if (game.getAllowedMoves (PlayerRole::defend).begin (), game.getAllowedMoves (PlayerRole::defend).end (), [] (Move allowedMove) { return allowedMove == Move::takeCards; }) != game.getAllowedMoves (PlayerRole::defend).end ());
+  auto const& allowedMovesAfterDefend = game.getAllowedMoves (PlayerRole::defend);
+  REQUIRE (std::find_if (allowedMovesAfterDefend.begin (), allowedMovesAfterDefend.end (), [] (Move allowedMove) { return allowedMove == Move::takeCards; }) != allowedMovesAfterDefend.end ());
 }
 
 TEST_CASE ("allowed moves assisting player", "[game]")
