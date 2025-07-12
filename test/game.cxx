@@ -71,6 +71,15 @@ TEST_CASE ("play one allowed and than one not allowed card", "[game]")
   REQUIRE (game.playerAssists (PlayerRole::attack, cardToPlay) == false);
 }
 
+TEST_CASE ("play card which is not in hand", "[game]")
+{
+  auto gameOption = GameOption{ .numberOfCardsPlayerShouldHave = 5 };
+  gameOption.customCardDeck = testCardDeck8 ();
+  auto game = Game{ { "player1", "player2" }, gameOption };
+  auto const& cardToPlay = std::vector<durak::Card>{{}};
+  REQUIRE_FALSE (game.playerStartsAttack (cardToPlay));
+}
+
 TEST_CASE ("allowed moves attacking player", "[game]")
 {
   auto gameOption = GameOption{};
