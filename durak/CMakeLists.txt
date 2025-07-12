@@ -34,6 +34,7 @@ install(FILES
         move.hxx
         player.hxx
         print.hxx
+        gameData.hxx
         DESTINATION include/durak
         )
 install(TARGETS durak DESTINATION lib)
