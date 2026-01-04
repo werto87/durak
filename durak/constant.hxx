@@ -4,7 +4,7 @@
 #include <sys/types.h>
 namespace durak
 {
-constexpr uint16_t const defaultMaxCardValue = 9;
+constexpr uint16_t const defaultMaxCardValue = 8;
 constexpr uint16_t const defaultTypeCount = 4;
 constexpr uint16_t const defaultNumberOfCardsPlayerShouldHave = 6;
 constexpr uint16_t const defaultRoundToStart = 1;

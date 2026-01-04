@@ -15,7 +15,7 @@ namespace durak::test
 TEST_CASE ("smallest card value can not beat a card", "[beats]")
 {
   auto cardDeck = generateCardDeck ();
-  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 1, .type = Type::clubs });
+  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 0, .type = Type::clubs });
   auto cardsBeaten = 0;
   while (auto card = drawCard (cardDeck))
     {
@@ -31,7 +31,7 @@ TEST_CASE ("smallest card value can not beat a card", "[beats]")
 TEST_CASE ("smallest card gets beaten by  cards with same symbol or trump", "[beats]")
 {
   auto cardDeck = generateCardDeck ();
-  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 1, .type = Type::clubs });
+  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 0, .type = Type::clubs });
   auto cardsBeaten = 0;
   while (auto card = drawCard (cardDeck))
     {
@@ -47,7 +47,7 @@ TEST_CASE ("smallest card gets beaten by  cards with same symbol or trump", "[be
 TEST_CASE ("highest card value and not trump beats every card with same symbol", "[beats]")
 {
   auto cardDeck = generateCardDeck ();
-  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 9, .type = Type::clubs });
+  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 8, .type = Type::clubs });
   auto cardsBeaten = 0;
   while (auto card = drawCard (cardDeck))
     {
@@ -63,7 +63,7 @@ TEST_CASE ("highest card value and not trump beats every card with same symbol",
 TEST_CASE ("highest card value and not trump gets only beaten by trump", "[beats]")
 {
   auto cardDeck = generateCardDeck ();
-  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 9, .type = Type::clubs });
+  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 8, .type = Type::clubs });
   auto cardsBeaten = 0;
   while (auto card = drawCard (cardDeck))
     {
@@ -79,7 +79,7 @@ TEST_CASE ("highest card value and not trump gets only beaten by trump", "[beats
 TEST_CASE ("highest card and trump beats every card", "[beats]")
 {
   auto cardDeck = generateCardDeck ();
-  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 9, .type = Type::clubs });
+  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 8, .type = Type::clubs });
   auto cardsBeaten = 0;
   while (auto card = drawCard (cardDeck))
     {
@@ -95,7 +95,7 @@ TEST_CASE ("highest card and trump beats every card", "[beats]")
 TEST_CASE ("highest card and trump cant be beaten", "[beats]")
 {
   auto cardDeck = generateCardDeck ();
-  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 9, .type = Type::clubs });
+  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 8, .type = Type::clubs });
   auto cardsBeaten = 0;
   while (auto card = drawCard (cardDeck))
     {
@@ -111,7 +111,7 @@ TEST_CASE ("highest card and trump cant be beaten", "[beats]")
 TEST_CASE ("lowest trump card and  beats every card which is not a trump", "[beats]")
 {
   auto cardDeck = generateCardDeck ();
-  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 1, .type = Type::clubs });
+  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 0, .type = Type::clubs });
   auto cardsBeaten = 0;
   while (auto card = drawCard (cardDeck))
     {
@@ -127,7 +127,7 @@ TEST_CASE ("lowest trump card and  beats every card which is not a trump", "[bea
 TEST_CASE ("lowest card and trump gets only beaten by other trump cards", "[beats]")
 {
   auto cardDeck = generateCardDeck ();
-  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 1, .type = Type::clubs });
+  auto cardToCompare = drawSpecificCard (cardDeck, Card{ .value = 0, .type = Type::clubs });
   auto cardsBeaten = 0;
   while (auto card = drawCard (cardDeck))
     {
@@ -143,30 +143,30 @@ TEST_CASE ("lowest card and trump gets only beaten by other trump cards", "[beat
 TEST_CASE ("cardsForIndex", "[cardsForIndex]")
 {
   auto player = Player{};
-  player.takeCards ({ { .value = 1, .type = Type::clubs }, { .value = 1, .type = Type::diamonds }, { .value = 2, .type = Type::clubs }, { .value = 2, .type = Type::diamonds }, { .value = 3, .type = Type::spades }, { .value = 4, .type = Type::clubs } });
+  player.takeCards ({ { .value = 0, .type = Type::clubs }, { .value = 0, .type = Type::diamonds }, { .value = 2, .type = Type::clubs }, { .value = 2, .type = Type::diamonds }, { .value = 3, .type = Type::spades }, { .value = 4, .type = Type::clubs } });
   auto cards = player.cardsForIndex ({ 0, 1, 2 });
-  REQUIRE (cards == std::vector<Card>{ { .value = 1, .type = Type::clubs }, { .value = 1, .type = Type::diamonds }, { .value = 2, .type = Type::clubs } });
+  REQUIRE (cards == std::vector<Card>{ { .value = 0, .type = Type::clubs }, { .value = 0, .type = Type::diamonds }, { .value = 2, .type = Type::clubs } });
 }
 
 TEST_CASE ("cardsForIndex out of bound", "[cardsForIndex]")
 {
   auto player = Player{};
-  player.takeCards ({ { .value = 1, .type = Type::clubs }, { .value = 1, .type = Type::diamonds }, { .value = 2, .type = Type::clubs }, { .value = 2, .type = Type::diamonds }, { .value = 3, .type = Type::spades }, { .value = 4, .type = Type::clubs } });
+  player.takeCards ({ { .value = 0, .type = Type::clubs }, { .value = 0, .type = Type::diamonds }, { .value = 2, .type = Type::clubs }, { .value = 2, .type = Type::diamonds }, { .value = 3, .type = Type::spades }, { .value = 4, .type = Type::clubs } });
   REQUIRE_THROWS (player.cardsForIndex ({ 41, 1, 2 }));
 }
 
 TEST_CASE ("card player has", "[put cards]")
 {
   auto player = Player{};
-  player.takeCards ({ { .value = 1, .type = Type::clubs } });
+  player.takeCards ({ { .value = 0, .type = Type::clubs } });
   auto target = std::vector<std::pair<Card, boost::optional<Card>>>{};
-  REQUIRE (player.putCards ({ { .value = 1, .type = Type::clubs } }, target));
+  REQUIRE (player.putCards ({ { .value = 0, .type = Type::clubs } }, target));
 }
 
 TEST_CASE ("put cards card which player does not have", "[put cards]")
 {
   auto player = Player{};
-  player.takeCards ({ { .value = 1, .type = Type::clubs } });
+  player.takeCards ({ { .value = 0, .type = Type::clubs } });
   auto target = std::vector<std::pair<Card, boost::optional<Card>>>{};
   REQUIRE (player.putCards ({ { .value = 42, .type = Type::clubs } }, target) == false);
 }
