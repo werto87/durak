@@ -742,9 +742,15 @@ public:
   }
 
   uint64_t
-  cardDeckSize ()
+  cardDeckSize () const
   {
     return cardDeck.size ();
+  }
+
+  std::vector<Card> const&
+  getCardDeck () const
+  {
+    return cardDeck;
   }
 
 private:
