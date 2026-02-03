@@ -747,10 +747,16 @@ public:
     return cardDeck.size ();
   }
 
-  std::vector<Card> const&
+  std::vector<Card> const &
   getCardDeck () const
   {
     return cardDeck;
+  }
+
+  size_t
+  getNumberOfCardsPlayerShouldHave () const
+  {
+    return numberOfCardsPlayerShouldHave;
   }
 
 private:
