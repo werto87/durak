@@ -20,7 +20,7 @@ class Project(ConanFile):
 
     def requirements(self):
         self.requires("catch2/2.13.9")
-        self.requires("confu_json/[>=1.0.2 <2]")
+        self.requires("confu_json/[>=1.0.2 <2]@modern-durak")
         self.requires("boost/1.86.0",force=True)
 
 
